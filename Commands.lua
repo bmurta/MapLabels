@@ -187,6 +187,63 @@ local function HandleSlashCommand(msg)
         print("/ml toggle - Cycle through modes")
         print("/mlc <name> - Capture coordinates with name")
         print("/mll - Capture coordinates only")
+        print("/mlz - Get current zone/map ID")
+    end
+end
+
+-- Function to get current zone/map ID
+local function HandleZoneIDCommand()
+    local mapID = C_Map.GetBestMapForUnit("player")
+    if not mapID then
+        print("|cffff0000Error:|r Could not get map ID")
+        return
+    end
+
+    local mapInfo = C_Map.GetMapInfo(mapID)
+    if mapInfo then
+        print("|cff00ff00Current Zone Info:|r")
+        print("Map ID: |cffffffff" .. mapID .. "|r")
+        print("Map Name: |cffffffff" .. mapInfo.name .. "|r")
+
+        -- Create a frame with an editbox for easy copying
+        if not MapLabelsZoneIDFrame then
+            MapLabelsZoneIDFrame = CreateFrame("Frame", "MapLabelsZoneIDFrame", UIParent, "BasicFrameTemplateWithInset")
+            MapLabelsZoneIDFrame:SetSize(300, 100)
+            MapLabelsZoneIDFrame:SetPoint("CENTER")
+            MapLabelsZoneIDFrame:Hide()
+            MapLabelsZoneIDFrame:SetMovable(true)
+            MapLabelsZoneIDFrame:EnableMouse(true)
+            MapLabelsZoneIDFrame:RegisterForDrag("LeftButton")
+            MapLabelsZoneIDFrame:SetScript("OnDragStart", MapLabelsZoneIDFrame.StartMoving)
+            MapLabelsZoneIDFrame:SetScript("OnDragStop", MapLabelsZoneIDFrame.StopMovingOrSizing)
+
+            MapLabelsZoneIDFrame.title = MapLabelsZoneIDFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+            MapLabelsZoneIDFrame.title:SetPoint("TOP", 0, -5)
+            MapLabelsZoneIDFrame.title:SetText("Copy Map ID (Ctrl+A, Ctrl+C)")
+
+            local scrollFrame = CreateFrame("ScrollFrame", nil, MapLabelsZoneIDFrame, "UIPanelScrollFrameTemplate")
+            scrollFrame:SetPoint("TOPLEFT", 10, -30)
+            scrollFrame:SetPoint("BOTTOMRIGHT", -30, 10)
+
+            local editBox = CreateFrame("EditBox", nil, scrollFrame)
+            editBox:SetMultiLine(true)
+            editBox:SetFontObject(ChatFontNormal)
+            editBox:SetWidth(250)
+            editBox:SetAutoFocus(false)
+            editBox:SetScript("OnEscapePressed", function()
+                MapLabelsZoneIDFrame:Hide()
+            end)
+
+            scrollFrame:SetScrollChild(editBox)
+            MapLabelsZoneIDFrame.editBox = editBox
+        end
+
+        -- Show the frame with the map ID
+        MapLabelsZoneIDFrame.editBox:SetText(tostring(mapID))
+        MapLabelsZoneIDFrame.editBox:HighlightText()
+        MapLabelsZoneIDFrame:Show()
+    else
+        print("|cffff0000Error:|r Could not get map info")
     end
 end
 
@@ -202,3 +259,7 @@ SlashCmdList["MAPLABELSCAPTURE"] = HandleCaptureCommand
 SLASH_MAPLABELSCOORDS1 = "/mll"
 SLASH_MAPLABELSCOORDS2 = "/coords"
 SlashCmdList["MAPLABELSCOORDS"] = HandleCoordsOnlyCommand
+
+SLASH_MAPLABELSZONEID1 = "/mlz"
+SLASH_MAPLABELSZONEID2 = "/zoneid"
+SlashCmdList["MAPLABELSZONEID"] = HandleZoneIDCommand
