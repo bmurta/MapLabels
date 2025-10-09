@@ -12,12 +12,12 @@ CityGuideNPCData = {
     },
     [2339] = { -- Dornogal
         -- Main Services
-        {x = 45.42 / 100, y = 47.51 / 100, name = "Inn", icon = "Interface\\Icons\\INV_Misc_Food_15", noCluster = true, color = "B8574D"}, -- Gold
-        {x = 52.50 / 100, y = 45.41 / 100, name = "Bank", icon = "Interface\\Icons\\INV_Misc_Bag_07", noCluster = true, textDirection = "right", color = "FFD700", labelDistance = 1.3}, 
+        {x = 45.42 / 100, y = 47.51 / 100, name = "Inn", icon = "Interface\\Icons\\INV_Misc_Food_15", noCluster = true}, 
+        {x = 52.50 / 100, y = 45.41 / 100, name = "Bank", icon = "Interface\\Icons\\INV_Misc_Bag_07", noCluster = true, textDirection = "right", color = "FFD700"}, 
         {x = 55.81 / 100, y = 48.60 / 100, name = "AH", icon = "Interface\\Icons\\INV_Misc_Coin_01", noCluster = true,},
         {x = 57.96 / 100, y = 56.48 / 100, name = "Orders", icon = "Interface\\Icons\\INV_Misc_Note_06", noCluster = true, textDirection = "right", labelDistance = 1.2},
-        {x = 51.66 / 100, y = 42.06 / 100, name = "Upgrades", icon = "Interface\\Icons\\INV_Misc_QirajiCrystal_05", noCluster = true, textDirection = "left", labelDistance = 1.8},
-        {x = 47.92 / 100, y = 67.89 / 100, name = "Rostrum", icon = "Interface\\Icons\\Ability_Mount_Drake_Azure", noCluster = true, textDirection = "left", labelDistance = 2.4},
+        {x = 51.66 / 100, y = 42.06 / 100, name = "Upgrades", icon = "Interface\\Icons\\INV_Misc_QirajiCrystal_05", noCluster = true, textDirection = "left", labelDistance = 1.3},
+        {x = 47.92 / 100, y = 67.89 / 100, name = "Rostrum", icon = "Interface\\Icons\\Ability_Mount_Drake_Azure", noCluster = true, textDirection = "left", labelDistance = 1.3},
         {x = 44.60 / 100, y = 55.91 / 100, name = "TP", icon = "Interface\\Icons\\Tradingpostcurrency", noCluster = true},
        
         -- Portals

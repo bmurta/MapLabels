@@ -93,7 +93,7 @@ function CityGuide_CreateOrUpdateMapButton()
         mapButton:SetSize(120, 22)
         
         if WorldMapFrame.overlayFrames and WorldMapFrame.overlayFrames[2] then
-            mapButton:SetPoint("RIGHT", WorldMapFrame.overlayFrames[2], "LEFT", -5, 0)
+            mapButton:SetPoint("RIGHT", WorldMapFrame.overlayFrames[2], "LEFT", -15, 0)
         else
             mapButton:SetPoint("TOPRIGHT", WorldMapFrame.BorderFrame, "TOPRIGHT", -10, -10)
         end

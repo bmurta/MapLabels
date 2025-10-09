@@ -110,14 +110,14 @@ sizeTitle:SetText("Size Settings")
 
 -- Label Size Slider
 local labelSizeTitle = panel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-labelSizeTitle:SetPoint("TOPLEFT", sizeTitle, "BOTTOMLEFT", 0, -15)
+labelSizeTitle:SetPoint("TOPLEFT", sizeTitle, "BOTTOMLEFT", 20, -20)
 labelSizeTitle:SetText("Label Size")
 
-local labelSizeSlider = CreateSlider(panel, "CityGuideLabelSizeSlider", 0.5, 2.0, 0.1, 20, -270)
-labelSizeSlider:SetValue(CityGuideConfig.labelSize or 1.0)
+local labelSizeSlider = CreateSlider(panel, "CityGuideLabelSizeSlider", 0.5, 2.0, 0.1, 20, -300)
+_G["CityGuideLabelSizeSliderText"]:Hide() -- Hide the default title
 
 local labelSizeValue = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-labelSizeValue:SetPoint("TOP", labelSizeSlider, "BOTTOM", 0, -5)
+labelSizeValue:SetPoint("TOP", labelSizeSlider, "BOTTOM", 0, 0)
 labelSizeValue:SetText(string.format("%.1fx", CityGuideConfig.labelSize or 1.0))
 
 labelSizeSlider:SetScript("OnValueChanged", function(self, value)
@@ -128,14 +128,14 @@ end)
 
 -- Icon Size Slider
 local iconSizeTitle = panel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-iconSizeTitle:SetPoint("TOPLEFT", labelSizeSlider, "BOTTOMLEFT", 0, -35)
+iconSizeTitle:SetPoint("TOPLEFT", labelSizeSlider, "BOTTOMLEFT", 0, -45)
 iconSizeTitle:SetText("Icon Size")
 
-local iconSizeSlider = CreateSlider(panel, "CityGuideIconSizeSlider", 0.5, 2.0, 0.1, 20, -330)
-iconSizeSlider:SetValue(CityGuideConfig.iconSize or 1.0)
+local iconSizeSlider = CreateSlider(panel, "CityGuideIconSizeSlider", 0.5, 2.0, 0.1, 20, -365)
+_G["CityGuideIconSizeSliderText"]:Hide() -- Hide the default title
 
 local iconSizeValue = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-iconSizeValue:SetPoint("TOP", iconSizeSlider, "BOTTOM", 0, -5)
+iconSizeValue:SetPoint("TOP", iconSizeSlider, "BOTTOM", 0, 0)
 iconSizeValue:SetText(string.format("%.1fx", CityGuideConfig.iconSize or 1.0))
 
 iconSizeSlider:SetScript("OnValueChanged", function(self, value)
@@ -147,7 +147,7 @@ end)
 -- Reset button
 local resetButton = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
 resetButton:SetSize(120, 25)
-resetButton:SetPoint("TOPLEFT", iconSizeSlider, "BOTTOMLEFT", 0, -40)
+resetButton:SetPoint("TOPLEFT", iconSizeSlider, "BOTTOMLEFT", 0, -30)
 resetButton:SetText("Reset to Default")
 
 resetButton:SetScript("OnClick", function()
