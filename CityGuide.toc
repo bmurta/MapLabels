@@ -1,13 +1,16 @@
 ## Interface: 110205
-## Title: Map Labels
+## Title: City Guide
 ## Notes: Displays important NPCs on capital city maps
 ## Author: YourName
 ## Version: 1.0
-## SavedVariables: MapLabelsConfig
+## SavedVariables: CityGuideConfig
 ## IconTexture: Interface\Icons\INV_Misc_Map02
 
 NPCData.lua
+Utils.lua
+Clustering.lua
+ProfessionFilter.lua
+UI.lua
 Core.lua
-MapButton.lua
 Commands.lua
 Settings.lua

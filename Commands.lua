@@ -1,4 +1,5 @@
--- Slash Commands for MapLabels
+-- Slash Commands for City Guide
+
 -- Coordinate capture helper
 local function CaptureCoordinates(npcName, iconPath)
     local mapID = C_Map.GetBestMapForUnit("player")
@@ -14,10 +15,9 @@ local function CaptureCoordinates(npcName, iconPath)
     end
 
     local x, y = position:GetXY()
-    x = x * 100 -- Convert to 0-100 format
+    x = x * 100
     y = y * 100
 
-    -- Format the output
     local output
     if iconPath then
         output = string.format('{x = %.2f / 100, y = %.2f / 100, name = "%s", icon = "%s"},', x, y, npcName, iconPath)
@@ -28,24 +28,22 @@ local function CaptureCoordinates(npcName, iconPath)
     print("|cff00ff00Coordinate captured!|r")
     print(output)
 
-    -- Create a frame with an editbox for easy copying
-    if not MapLabelsCopyFrame then
-        MapLabelsCopyFrame = CreateFrame("Frame", "MapLabelsCopyFrame", UIParent, "BasicFrameTemplateWithInset")
-        MapLabelsCopyFrame:SetSize(600, 120)
-        MapLabelsCopyFrame:SetPoint("CENTER")
-        MapLabelsCopyFrame:Hide()
-        MapLabelsCopyFrame:SetMovable(true)
-        MapLabelsCopyFrame:EnableMouse(true)
-        MapLabelsCopyFrame:RegisterForDrag("LeftButton")
-        MapLabelsCopyFrame:SetScript("OnDragStart", MapLabelsCopyFrame.StartMoving)
-        MapLabelsCopyFrame:SetScript("OnDragStop", MapLabelsCopyFrame.StopMovingOrSizing)
+    if not CityGuideCopyFrame then
+        CityGuideCopyFrame = CreateFrame("Frame", "CityGuideCopyFrame", UIParent, "BasicFrameTemplateWithInset")
+        CityGuideCopyFrame:SetSize(600, 120)
+        CityGuideCopyFrame:SetPoint("CENTER")
+        CityGuideCopyFrame:Hide()
+        CityGuideCopyFrame:SetMovable(true)
+        CityGuideCopyFrame:EnableMouse(true)
+        CityGuideCopyFrame:RegisterForDrag("LeftButton")
+        CityGuideCopyFrame:SetScript("OnDragStart", CityGuideCopyFrame.StartMoving)
+        CityGuideCopyFrame:SetScript("OnDragStop", CityGuideCopyFrame.StopMovingOrSizing)
 
-        MapLabelsCopyFrame.title = MapLabelsCopyFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        MapLabelsCopyFrame.title:SetPoint("TOP", 0, -5)
-        MapLabelsCopyFrame.title:SetText("Copy Coordinates (Ctrl+A, Ctrl+C)")
+        CityGuideCopyFrame.title = CityGuideCopyFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        CityGuideCopyFrame.title:SetPoint("TOP", 0, -5)
+        CityGuideCopyFrame.title:SetText("Copy Coordinates (Ctrl+A, Ctrl+C)")
 
-        -- Create scrollable editbox
-        local scrollFrame = CreateFrame("ScrollFrame", nil, MapLabelsCopyFrame, "UIPanelScrollFrameTemplate")
+        local scrollFrame = CreateFrame("ScrollFrame", nil, CityGuideCopyFrame, "UIPanelScrollFrameTemplate")
         scrollFrame:SetPoint("TOPLEFT", 10, -30)
         scrollFrame:SetPoint("BOTTOMRIGHT", -30, 10)
 
@@ -55,41 +53,20 @@ local function CaptureCoordinates(npcName, iconPath)
         editBox:SetWidth(550)
         editBox:SetAutoFocus(false)
         editBox:SetScript("OnEscapePressed", function()
-            MapLabelsCopyFrame:Hide()
+            CityGuideCopyFrame:Hide()
         end)
 
         scrollFrame:SetScrollChild(editBox)
-        MapLabelsCopyFrame.editBox = editBox
+        CityGuideCopyFrame.editBox = editBox
     end
 
-    -- Show the frame with the coordinate text
-    MapLabelsCopyFrame.editBox:SetText(output)
-    MapLabelsCopyFrame.editBox:HighlightText()
-    MapLabelsCopyFrame:Show()
-end
-
--- Slash command for coordinate capture
-local function HandleCaptureCommand(msg)
-    local npcName, iconPath = msg:match("^(.-)%s*,%s*(.+)$")
-
-    if not npcName or npcName == "" then
-        npcName = msg:trim()
-    end
-
-    if npcName == "" then
-        print("|cff00ff00MapLabels Coordinate Capture:|r")
-        print("/mlc <name> - Capture coordinates for NPC")
-        print("/mlc <name>, <icon path> - Capture with icon path")
-        print("|cffaaaaaa Example: /mlc Bank")
-        print("|cffaaaaaa Example: /mlc Bank, Interface\\\\Icons\\\\INV_Misc_Bag_07")
-        return
-    end
-
-    CaptureCoordinates(npcName, iconPath)
+    CityGuideCopyFrame.editBox:SetText(output)
+    CityGuideCopyFrame.editBox:HighlightText()
+    CityGuideCopyFrame:Show()
 end
 
 -- Slash command for coordinate capture (coordinates only)
-local function HandleCoordsOnlyCommand(msg)
+local function HandleCoordsOnly()
     local mapID = C_Map.GetBestMapForUnit("player")
     if not mapID then
         print("|cffff0000Error:|r Could not get map ID")
@@ -103,33 +80,30 @@ local function HandleCoordsOnlyCommand(msg)
     end
 
     local x, y = position:GetXY()
-    x = x * 100 -- Convert to 0-100 format
+    x = x * 100
     y = y * 100
 
-    -- Format just the coordinates
     local output = string.format('{x = %.2f / 100, y = %.2f / 100,', x, y)
 
     print("|cff00ff00Coordinates captured!|r")
     print(output)
 
-    -- Create a frame with an editbox for easy copying
-    if not MapLabelsCoordsFrame then
-        MapLabelsCoordsFrame = CreateFrame("Frame", "MapLabelsCoordsFrame", UIParent, "BasicFrameTemplateWithInset")
-        MapLabelsCoordsFrame:SetSize(400, 100)
-        MapLabelsCoordsFrame:SetPoint("CENTER")
-        MapLabelsCoordsFrame:Hide()
-        MapLabelsCoordsFrame:SetMovable(true)
-        MapLabelsCoordsFrame:EnableMouse(true)
-        MapLabelsCoordsFrame:RegisterForDrag("LeftButton")
-        MapLabelsCoordsFrame:SetScript("OnDragStart", MapLabelsCoordsFrame.StartMoving)
-        MapLabelsCoordsFrame:SetScript("OnDragStop", MapLabelsCoordsFrame.StopMovingOrSizing)
+    if not CityGuideCoordsFrame then
+        CityGuideCoordsFrame = CreateFrame("Frame", "CityGuideCoordsFrame", UIParent, "BasicFrameTemplateWithInset")
+        CityGuideCoordsFrame:SetSize(400, 100)
+        CityGuideCoordsFrame:SetPoint("CENTER")
+        CityGuideCoordsFrame:Hide()
+        CityGuideCoordsFrame:SetMovable(true)
+        CityGuideCoordsFrame:EnableMouse(true)
+        CityGuideCoordsFrame:RegisterForDrag("LeftButton")
+        CityGuideCoordsFrame:SetScript("OnDragStart", CityGuideCoordsFrame.StartMoving)
+        CityGuideCoordsFrame:SetScript("OnDragStop", CityGuideCoordsFrame.StopMovingOrSizing)
 
-        MapLabelsCoordsFrame.title = MapLabelsCoordsFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        MapLabelsCoordsFrame.title:SetPoint("TOP", 0, -5)
-        MapLabelsCoordsFrame.title:SetText("Copy Coordinates (Ctrl+A, Ctrl+C)")
+        CityGuideCoordsFrame.title = CityGuideCoordsFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        CityGuideCoordsFrame.title:SetPoint("TOP", 0, -5)
+        CityGuideCoordsFrame.title:SetText("Copy Coordinates (Ctrl+A, Ctrl+C)")
 
-        -- Create scrollable editbox
-        local scrollFrame = CreateFrame("ScrollFrame", nil, MapLabelsCoordsFrame, "UIPanelScrollFrameTemplate")
+        local scrollFrame = CreateFrame("ScrollFrame", nil, CityGuideCoordsFrame, "UIPanelScrollFrameTemplate")
         scrollFrame:SetPoint("TOPLEFT", 10, -30)
         scrollFrame:SetPoint("BOTTOMRIGHT", -30, 10)
 
@@ -139,127 +113,161 @@ local function HandleCoordsOnlyCommand(msg)
         editBox:SetWidth(350)
         editBox:SetAutoFocus(false)
         editBox:SetScript("OnEscapePressed", function()
-            MapLabelsCoordsFrame:Hide()
+            CityGuideCoordsFrame:Hide()
         end)
 
         scrollFrame:SetScrollChild(editBox)
-        MapLabelsCoordsFrame.editBox = editBox
+        CityGuideCoordsFrame.editBox = editBox
     end
 
-    -- Show the frame with the coordinate text
-    MapLabelsCoordsFrame.editBox:SetText(output)
-    MapLabelsCoordsFrame.editBox:HighlightText()
-    MapLabelsCoordsFrame:Show()
-end
-
--- Main slash command handler
-local function HandleSlashCommand(msg)
-    msg = msg:lower():trim()
-
-    if msg == "both" then
-        MapLabelsConfig.displayMode = "both"
-        print("|cff00ff00MapLabels:|r Icons with labels enabled!")
-        MapLabels_UpdateMapLabels()
-    elseif msg == "icons" or msg == "icon" then
-        MapLabelsConfig.displayMode = "icons"
-        print("|cff00ff00MapLabels:|r Icons only mode!")
-        MapLabels_UpdateMapLabels()
-    elseif msg == "labels" or msg == "label" then
-        MapLabelsConfig.displayMode = "labels"
-        print("|cff00ff00MapLabels:|r Labels only mode!")
-        MapLabels_UpdateMapLabels()
-    elseif msg == "toggle" then
-        -- Cycle through modes: labels -> icons -> both -> labels
-        if MapLabelsConfig.displayMode == "labels" then
-            MapLabelsConfig.displayMode = "icons"
-        elseif MapLabelsConfig.displayMode == "icons" then
-            MapLabelsConfig.displayMode = "both"
-        else
-            MapLabelsConfig.displayMode = "labels"
-        end
-        print("|cff00ff00MapLabels:|r Switched to " .. MapLabelsConfig.displayMode .. " mode!")
-        MapLabels_UpdateMapLabels()
-    else
-        print("|cff00ff00MapLabels Commands:|r")
-        print("/ml labels - Show labels only")
-        print("/ml icons - Show icons only")
-        print("/ml both - Show icons with labels")
-        print("/ml toggle - Cycle through modes")
-        print("/mlc <name> - Capture coordinates with name")
-        print("/mll - Capture coordinates only")
-        print("/mlz - Get current zone/map ID")
-    end
+    CityGuideCoordsFrame.editBox:SetText(output)
+    CityGuideCoordsFrame.editBox:HighlightText()
+    CityGuideCoordsFrame:Show()
 end
 
 -- Function to get current zone/map ID
-local function HandleZoneIDCommand()
+local function HandleZoneID()
     local mapID = C_Map.GetBestMapForUnit("player")
     if not mapID then
         print("|cffff0000Error:|r Could not get map ID")
         return
     end
-
+    
     local mapInfo = C_Map.GetMapInfo(mapID)
     if mapInfo then
         print("|cff00ff00Current Zone Info:|r")
         print("Map ID: |cffffffff" .. mapID .. "|r")
         print("Map Name: |cffffffff" .. mapInfo.name .. "|r")
-
-        -- Create a frame with an editbox for easy copying
-        if not MapLabelsZoneIDFrame then
-            MapLabelsZoneIDFrame = CreateFrame("Frame", "MapLabelsZoneIDFrame", UIParent, "BasicFrameTemplateWithInset")
-            MapLabelsZoneIDFrame:SetSize(300, 100)
-            MapLabelsZoneIDFrame:SetPoint("CENTER")
-            MapLabelsZoneIDFrame:Hide()
-            MapLabelsZoneIDFrame:SetMovable(true)
-            MapLabelsZoneIDFrame:EnableMouse(true)
-            MapLabelsZoneIDFrame:RegisterForDrag("LeftButton")
-            MapLabelsZoneIDFrame:SetScript("OnDragStart", MapLabelsZoneIDFrame.StartMoving)
-            MapLabelsZoneIDFrame:SetScript("OnDragStop", MapLabelsZoneIDFrame.StopMovingOrSizing)
-
-            MapLabelsZoneIDFrame.title = MapLabelsZoneIDFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-            MapLabelsZoneIDFrame.title:SetPoint("TOP", 0, -5)
-            MapLabelsZoneIDFrame.title:SetText("Copy Map ID (Ctrl+A, Ctrl+C)")
-
-            local scrollFrame = CreateFrame("ScrollFrame", nil, MapLabelsZoneIDFrame, "UIPanelScrollFrameTemplate")
+        
+        if not CityGuideZoneIDFrame then
+            CityGuideZoneIDFrame = CreateFrame("Frame", "CityGuideZoneIDFrame", UIParent, "BasicFrameTemplateWithInset")
+            CityGuideZoneIDFrame:SetSize(300, 100)
+            CityGuideZoneIDFrame:SetPoint("CENTER")
+            CityGuideZoneIDFrame:Hide()
+            CityGuideZoneIDFrame:SetMovable(true)
+            CityGuideZoneIDFrame:EnableMouse(true)
+            CityGuideZoneIDFrame:RegisterForDrag("LeftButton")
+            CityGuideZoneIDFrame:SetScript("OnDragStart", CityGuideZoneIDFrame.StartMoving)
+            CityGuideZoneIDFrame:SetScript("OnDragStop", CityGuideZoneIDFrame.StopMovingOrSizing)
+            
+            CityGuideZoneIDFrame.title = CityGuideZoneIDFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+            CityGuideZoneIDFrame.title:SetPoint("TOP", 0, -5)
+            CityGuideZoneIDFrame.title:SetText("Copy Map ID (Ctrl+A, Ctrl+C)")
+            
+            local scrollFrame = CreateFrame("ScrollFrame", nil, CityGuideZoneIDFrame, "UIPanelScrollFrameTemplate")
             scrollFrame:SetPoint("TOPLEFT", 10, -30)
             scrollFrame:SetPoint("BOTTOMRIGHT", -30, 10)
-
+            
             local editBox = CreateFrame("EditBox", nil, scrollFrame)
             editBox:SetMultiLine(true)
             editBox:SetFontObject(ChatFontNormal)
             editBox:SetWidth(250)
             editBox:SetAutoFocus(false)
             editBox:SetScript("OnEscapePressed", function()
-                MapLabelsZoneIDFrame:Hide()
+                CityGuideZoneIDFrame:Hide()
             end)
-
+            
             scrollFrame:SetScrollChild(editBox)
-            MapLabelsZoneIDFrame.editBox = editBox
+            CityGuideZoneIDFrame.editBox = editBox
         end
-
-        -- Show the frame with the map ID
-        MapLabelsZoneIDFrame.editBox:SetText(tostring(mapID))
-        MapLabelsZoneIDFrame.editBox:HighlightText()
-        MapLabelsZoneIDFrame:Show()
+        
+        CityGuideZoneIDFrame.editBox:SetText(tostring(mapID))
+        CityGuideZoneIDFrame.editBox:HighlightText()
+        CityGuideZoneIDFrame:Show()
     else
         print("|cffff0000Error:|r Could not get map info")
     end
 end
 
+-- Main slash command handler
+local function HandleSlashCommand(msg)
+    local cmd, arg = msg:match("^(%S*)%s*(.-)$")
+    cmd = cmd:lower()
+
+    if cmd == "both" then
+        CityGuideConfig.displayMode = "both"
+        print("|cff00ff00City Guide:|r Icons with labels enabled!")
+        CityGuide_UpdateMapLabels()
+    elseif cmd == "icons" or cmd == "icon" then
+        CityGuideConfig.displayMode = "icons"
+        print("|cff00ff00City Guide:|r Icons only mode!")
+        CityGuide_UpdateMapLabels()
+    elseif cmd == "labels" or cmd == "label" then
+        CityGuideConfig.displayMode = "labels"
+        print("|cff00ff00City Guide:|r Labels only mode!")
+        CityGuide_UpdateMapLabels()
+    elseif cmd == "toggle" then
+        if CityGuideConfig.displayMode == "labels" then
+            CityGuideConfig.displayMode = "icons"
+        elseif CityGuideConfig.displayMode == "icons" then
+            CityGuideConfig.displayMode = "both"
+        else
+            CityGuideConfig.displayMode = "labels"
+        end
+        print("|cff00ff00City Guide:|r Switched to " .. CityGuideConfig.displayMode .. " mode!")
+        CityGuide_UpdateMapLabels()
+    elseif cmd == "prof" or cmd == "professions" then
+        CityGuideConfig.filterByProfession = not CityGuideConfig.filterByProfession
+        if CityGuideConfig.filterByProfession then
+            print("|cff00ff00City Guide:|r Profession filter enabled")
+        else
+            print("|cff00ff00City Guide:|r Profession filter disabled")
+        end
+        CityGuide_UpdateMapLabels()
+    elseif cmd == "labelsize" then
+        local size = tonumber(arg)
+        if size and size >= 0.5 and size <= 2.0 then
+            CityGuideConfig.labelSize = size
+            print("|cff00ff00City Guide:|r Label size set to " .. string.format("%.1fx", size))
+            CityGuide_UpdateMapLabels()
+        else
+            print("|cffff0000City Guide:|r Invalid size. Use a number between 0.5 and 2.0")
+            print("|cffaaaaaa Example: /cg labelsize 1.5")
+        end
+    elseif cmd == "iconsize" then
+        local size = tonumber(arg)
+        if size and size >= 0.5 and size <= 2.0 then
+            CityGuideConfig.iconSize = size
+            print("|cff00ff00City Guide:|r Icon size set to " .. string.format("%.1fx", size))
+            CityGuide_UpdateMapLabels()
+        else
+            print("|cffff0000City Guide:|r Invalid size. Use a number between 0.5 and 2.0")
+            print("|cffaaaaaa Example: /cg iconsize 1.2")
+        end
+    elseif cmd == "resetsize" then
+        CityGuideConfig.labelSize = 1.0
+        CityGuideConfig.iconSize = 1.0
+        print("|cff00ff00City Guide:|r Sizes reset to default (1.0x)")
+        CityGuide_UpdateMapLabels()
+    -- Dev commands (hidden from help)
+    elseif cmd == "capture" then
+        if arg and arg ~= "" then
+            local npcName, iconPath = arg:match("^(.-)%s*,%s*(.+)$")
+            if not npcName or npcName == "" then
+                npcName = arg:trim()
+            end
+            CaptureCoordinates(npcName, iconPath)
+        else
+            print("|cffaaaaaa Usage: /cg capture <name> [, icon path]")
+        end
+    elseif cmd == "coords" then
+        HandleCoordsOnly()
+    elseif cmd == "zoneid" then
+        HandleZoneID()
+    else
+        print("|cff00ff00City Guide Commands:|r")
+        print("/cg labels - Show labels only")
+        print("/cg icons - Show icons only")
+        print("/cg both - Show icons with labels")
+        print("/cg toggle - Cycle through modes")
+        print("/cg prof - Toggle profession filter")
+        print("/cg labelsize <0.5-2.0> - Set label size")
+        print("/cg iconsize <0.5-2.0> - Set icon size")
+        print("/cg resetsize - Reset sizes to default")
+    end
+end
+
 -- Register slash commands
-SLASH_MAPLABELS1 = "/maplabels"
-SLASH_MAPLABELS2 = "/ml"
-SlashCmdList["MAPLABELS"] = HandleSlashCommand
-
-SLASH_MAPLABELSCAPTURE1 = "/mlc"
-SLASH_MAPLABELSCAPTURE2 = "/capture"
-SlashCmdList["MAPLABELSCAPTURE"] = HandleCaptureCommand
-
-SLASH_MAPLABELSCOORDS1 = "/mll"
-SLASH_MAPLABELSCOORDS2 = "/coords"
-SlashCmdList["MAPLABELSCOORDS"] = HandleCoordsOnlyCommand
-
-SLASH_MAPLABELSZONEID1 = "/mlz"
-SLASH_MAPLABELSZONEID2 = "/zoneid"
-SlashCmdList["MAPLABELSZONEID"] = HandleZoneIDCommand
+SLASH_CITYGUIDE1 = "/cityguide"
+SLASH_CITYGUIDE2 = "/cg"
+SlashCmdList["CITYGUIDE"] = HandleSlashCommand
