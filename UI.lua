@@ -3,6 +3,14 @@
 -- Map button reference
 local mapButton = nil
 local profFilterButton = nil
+local buttonContainer = nil
+
+-- Icon paths for each mode (better choices)
+local modeIcons = {
+    labels = "Interface\\Icons\\INV_Inscription_Scroll",  -- Scroll icon for text
+    icons = "Interface\\Icons\\Ability_Spy",              -- Spyglass for viewing/finding
+    both = "Interface\\Icons\\INV_Misc_Map02"             -- Map icon for both
+}
 
 -- Function to create a label (text only)
 function CityGuide_CreateTextLabel(parent, x, y, text, scale, textDirection, color, labelDistance, sizeMultiplier)
@@ -10,9 +18,8 @@ function CityGuide_CreateTextLabel(parent, x, y, text, scale, textDirection, col
     textDirection = textDirection or "down"
     color = color or "FFFFFF"
     labelDistance = labelDistance or 1.0
-    sizeMultiplier = sizeMultiplier or 1.0 -- New parameter for label size
+    sizeMultiplier = sizeMultiplier or 1.0
     
-    -- Apply size multiplier to scale
     local finalScale = scale * sizeMultiplier
     
     local container = CreateFrame("Frame", nil, parent)
@@ -61,9 +68,8 @@ end
 -- Function to create icon only
 function CityGuide_CreateIconOnly(parent, x, y, iconPath, scale, sizeMultiplier)
     scale = scale or 1.0
-    sizeMultiplier = sizeMultiplier or 1.0 -- New parameter for icon size
+    sizeMultiplier = sizeMultiplier or 1.0
     
-    -- Apply size multiplier to scale
     local finalScale = scale * sizeMultiplier
     
     local container = CreateFrame("Frame", nil, parent)
@@ -86,91 +92,56 @@ function CityGuide_CreateIconOnly(parent, x, y, iconPath, scale, sizeMultiplier)
     return container
 end
 
--- Function to create/update the map button
+-- Function to create/update the combined button container
 function CityGuide_CreateOrUpdateMapButton()
-    if not mapButton then
-        mapButton = CreateFrame("Button", "CityGuideToggleButton", WorldMapFrame.BorderFrame, "UIPanelButtonTemplate")
-        mapButton:SetSize(120, 22)
+    if not buttonContainer then
+        -- Create container frame with backdrop
+        buttonContainer = CreateFrame("Frame", "CityGuideButtonContainer", WorldMapFrame.BorderFrame, "BackdropTemplate")
+        buttonContainer:SetSize(70, 30)
         
+        -- Position it
         if WorldMapFrame.overlayFrames and WorldMapFrame.overlayFrames[2] then
-            mapButton:SetPoint("RIGHT", WorldMapFrame.overlayFrames[2], "LEFT", -15, 0)
+            buttonContainer:SetPoint("RIGHT", WorldMapFrame.overlayFrames[2], "LEFT", -10, 0)
         else
-            mapButton:SetPoint("TOPRIGHT", WorldMapFrame.BorderFrame, "TOPRIGHT", -10, -10)
+            buttonContainer:SetPoint("TOPRIGHT", WorldMapFrame.BorderFrame, "TOPRIGHT", -10, -10)
         end
         
-        mapButton:SetScript("OnClick", function()
-            if CityGuideConfig.displayMode == "labels" then
-                CityGuideConfig.displayMode = "icons"
-            elseif CityGuideConfig.displayMode == "icons" then
-                CityGuideConfig.displayMode = "both"
-            else
-                CityGuideConfig.displayMode = "labels"
-            end
-            
-            CityGuide_CreateOrUpdateMapButton()
-            CityGuide_UpdateMapLabels()
-            print("|cff00ff00City Guide:|r Switched to " .. CityGuideConfig.displayMode .. " mode!")
-        end)
+        -- Set backdrop (dark background)
+        buttonContainer:SetBackdrop({
+            bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+            edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+            tile = true,
+            tileSize = 16,
+            edgeSize = 12,
+            insets = { left = 3, right = 3, top = 3, bottom = 3 }
+        })
+        buttonContainer:SetBackdropColor(0, 0, 0, 0.8)
+        buttonContainer:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
         
-        mapButton:SetScript("OnEnter", function(self)
-            GameTooltip:SetOwner(self, "ANCHOR_TOP")
-            GameTooltip:SetText("City Guide Display Mode")
-            GameTooltip:AddLine("Click to cycle through display modes", 1, 1, 1)
-            GameTooltip:Show()
-        end)
-        
-        mapButton:SetScript("OnLeave", function()
-            GameTooltip:Hide()
-        end)
-    end
-    
-    if CityGuideConfig.displayMode == "labels" then
-        mapButton:SetText("Labels Only")
-    elseif CityGuideConfig.displayMode == "icons" then
-        mapButton:SetText("Icons Only")
-    else
-        mapButton:SetText("Icons + Labels")
-    end
-    
-    mapButton:Show()
-end
-
--- Function to create/update profession filter button
-function CityGuide_CreateOrUpdateProfFilterButton()
-    if not profFilterButton then
-        profFilterButton = CreateFrame("CheckButton", "CityGuideProfFilterButton", WorldMapFrame.BorderFrame, "UICheckButtonTemplate")
-        profFilterButton:SetSize(22, 22)
-        
-        if mapButton then
-            profFilterButton:SetPoint("RIGHT", mapButton, "LEFT", -5, 0)
-        else
-            profFilterButton:SetPoint("TOPRIGHT", WorldMapFrame.BorderFrame, "TOPRIGHT", -140, -10)
-        end
-        
-        local label = profFilterButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        label:SetPoint("RIGHT", profFilterButton, "LEFT", -5, 0)
-        label:SetText("My Profs")
+        -- Create profession filter as a standard checkbox
+        profFilterButton = CreateFrame("CheckButton", "CityGuideProfFilterButton", buttonContainer, "UICheckButtonTemplate")
+        profFilterButton:SetSize(24, 24)
+        profFilterButton:SetPoint("LEFT", buttonContainer, "LEFT", 5, 0)
         
         profFilterButton:SetScript("OnClick", function(self)
             CityGuideConfig.filterByProfession = self:GetChecked()
             CityGuide_UpdateMapLabels()
             
             if CityGuideConfig.filterByProfession then
-                local profs = CityGuide_GetPlayerProfessions()
-                if #profs > 0 then
-                    print("|cff00ff00City Guide:|r Filtering to your professions")
-                else
-                    print("|cffff0000City Guide:|r You have no professions learned")
-                end
+                print("|cff00ff00City Guide:|r Profession filter enabled")
             else
-                print("|cff00ff00City Guide:|r Showing all professions")
+                print("|cff00ff00City Guide:|r Profession filter disabled")
             end
         end)
         
         profFilterButton:SetScript("OnEnter", function(self)
-            GameTooltip:SetOwner(self, "ANCHOR_TOP")
+            GameTooltip:SetOwner(self, "ANCHOR_LEFT")
             GameTooltip:SetText("Filter My Professions")
-            GameTooltip:AddLine("Only show your learned professions", 1, 1, 1)
+            if CityGuideConfig.filterByProfession then
+                GameTooltip:AddLine("|cff00ff00Enabled|r - Showing only your professions", 1, 1, 1)
+            else
+                GameTooltip:AddLine("|cffaaaaaa Disabled|r - Showing all professions", 1, 1, 1)
+            end
             local profs = CityGuide_GetPlayerProfessions()
             if #profs > 0 then
                 GameTooltip:AddLine(" ", 1, 1, 1)
@@ -179,28 +150,90 @@ function CityGuide_CreateOrUpdateProfFilterButton()
                     GameTooltip:AddLine("  • " .. profNames[1], 1, 1, 1)
                 end
             end
+            GameTooltip:AddLine(" ", 1, 1, 1)
+            GameTooltip:AddLine("Click to toggle", 0.8, 0.8, 0.8)
             GameTooltip:Show()
         end)
         
-        profFilterButton:SetScript("OnLeave", function()
+        profFilterButton:SetScript("OnLeave", function(self)
+            GameTooltip:Hide()
+        end)
+        
+        -- Create mode toggle button
+        mapButton = CreateFrame("Button", "CityGuideToggleButton", buttonContainer)
+        mapButton:SetSize(24, 24)
+        mapButton:SetPoint("LEFT", profFilterButton, "RIGHT", 8, 0)
+        
+        -- Mode icon
+        local modeIcon = mapButton:CreateTexture(nil, "ARTWORK")
+        modeIcon:SetSize(20, 20)
+        modeIcon:SetPoint("CENTER")
+        modeIcon:SetTexture(modeIcons[CityGuideConfig.displayMode])
+        mapButton.icon = modeIcon
+        
+        mapButton:SetScript("OnClick", function(self)
+            if CityGuideConfig.displayMode == "labels" then
+                CityGuideConfig.displayMode = "icons"
+            elseif CityGuideConfig.displayMode == "icons" then
+                CityGuideConfig.displayMode = "both"
+            else
+                CityGuideConfig.displayMode = "labels"
+            end
+            
+            -- Update icon immediately
+            self.icon:SetTexture(modeIcons[CityGuideConfig.displayMode])
+            CityGuide_UpdateMapLabels()
+            
+            -- Force refresh tooltip if it's showing
+            if GameTooltip:IsOwned(self) then
+                GameTooltip:Hide()
+                self:GetScript("OnEnter")(self)
+            end
+            
+            local modeName = CityGuideConfig.displayMode == "labels" and "Labels Only" or
+                            CityGuideConfig.displayMode == "icons" and "Icons Only" or
+                            "Icons with Labels"
+            print("|cff00ff00City Guide:|r " .. modeName)
+        end)
+        
+        mapButton:SetScript("OnEnter", function(self)
+            self.icon:SetVertexColor(1, 1, 0.5)
+            
+            local modeName = CityGuideConfig.displayMode == "labels" and "Labels Only" or
+                            CityGuideConfig.displayMode == "icons" and "Icons Only" or
+                            "Icons with Labels"
+            
+            GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+            GameTooltip:SetText("City Guide Display")
+            GameTooltip:AddLine("Current: |cff00ff00" .. modeName .. "|r", 1, 1, 1)
+            GameTooltip:AddLine(" ", 1, 1, 1)
+            GameTooltip:AddLine("Click to cycle modes", 0.8, 0.8, 0.8)
+            GameTooltip:Show()
+        end)
+        
+        mapButton:SetScript("OnLeave", function(self)
+            self.icon:SetVertexColor(1, 1, 1)
             GameTooltip:Hide()
         end)
     end
     
+    -- Update checkbox state
     profFilterButton:SetChecked(CityGuideConfig.filterByProfession)
-    profFilterButton:Show()
+    
+    -- Update mode icon
+    mapButton.icon:SetTexture(modeIcons[CityGuideConfig.displayMode])
+    
+    buttonContainer:Show()
 end
 
 -- Function to hide the map button
 function CityGuide_HideMapButton()
-    if mapButton then
-        mapButton:Hide()
+    if buttonContainer then
+        buttonContainer:Hide()
     end
 end
 
--- Function to hide profession filter button
+-- Function to hide profession filter button (kept for compatibility)
 function CityGuide_HideProfFilterButton()
-    if profFilterButton then
-        profFilterButton:Hide()
-    end
+    -- No longer needed, handled by hiding container
 end

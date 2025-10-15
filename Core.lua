@@ -37,11 +37,9 @@ function CityGuide_UpdateMapLabels()
 
     -- Only show button if we have data for this map
     if mapID and CityGuideNPCData[mapID] then
-        CityGuide_CreateOrUpdateMapButton()
-        CityGuide_CreateOrUpdateProfFilterButton()
+        CityGuide_CreateOrUpdateMapButton() -- Only call this one now
     else
         CityGuide_HideMapButton()
-        CityGuide_HideProfFilterButton()
         return
     end
 
