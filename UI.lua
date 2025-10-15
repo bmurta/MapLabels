@@ -23,22 +23,52 @@ function CityGuide_CreateTextLabel(parent, x, y, text, scale, textDirection, col
     local finalScale = scale * sizeMultiplier
     
     local container = CreateFrame("Frame", nil, parent)
-    container:SetSize(200 * finalScale, 26 * finalScale)
+    container:SetSize(200 * finalScale, 50 * finalScale) -- Increased height for multi-line
     
     container:SetFrameStrata("HIGH")
     container:SetFrameLevel(9999)
 
-    local fontString = container:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    fontString:SetPoint("CENTER")
-    fontString:SetText(text)
+    -- Check if text contains line breaks
+    local lines = {}
+    for line in text:gmatch("[^\n]+") do
+        table.insert(lines, line)
+    end
     
-    local r = tonumber(color:sub(1, 2), 16) / 255
-    local g = tonumber(color:sub(3, 4), 16) / 255
-    local b = tonumber(color:sub(5, 6), 16) / 255
-    fontString:SetTextColor(r, g, b, 1)
-    
-    local font, _, flags = fontString:GetFont()
-    fontString:SetFont(font, 16 * finalScale, "OUTLINE")
+    if #lines > 1 then
+        -- Multi-line text - create multiple font strings
+        local lineHeight = 16 * finalScale
+        local totalHeight = lineHeight * #lines
+        
+        for i, line in ipairs(lines) do
+            local fontString = container:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+            
+            -- Position each line
+            local yOffset = (totalHeight / 2) - (i - 0.5) * lineHeight
+            fontString:SetPoint("CENTER", container, "CENTER", 0, yOffset)
+            fontString:SetText(line)
+            
+            local r = tonumber(color:sub(1, 2), 16) / 255
+            local g = tonumber(color:sub(3, 4), 16) / 255
+            local b = tonumber(color:sub(5, 6), 16) / 255
+            fontString:SetTextColor(r, g, b, 1)
+            
+            local font, _, flags = fontString:GetFont()
+            fontString:SetFont(font, 16 * finalScale, "OUTLINE")
+        end
+    else
+        -- Single-line text (original code)
+        local fontString = container:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+        fontString:SetPoint("CENTER")
+        fontString:SetText(text)
+        
+        local r = tonumber(color:sub(1, 2), 16) / 255
+        local g = tonumber(color:sub(3, 4), 16) / 255
+        local b = tonumber(color:sub(5, 6), 16) / 255
+        fontString:SetTextColor(r, g, b, 1)
+        
+        local font, _, flags = fontString:GetFont()
+        fontString:SetFont(font, 16 * finalScale, "OUTLINE")
+    end
 
     local mapWidth = parent:GetWidth()
     local mapHeight = parent:GetHeight()
@@ -101,7 +131,7 @@ function CityGuide_CreateOrUpdateMapButton()
         
         -- Position it
         if WorldMapFrame.overlayFrames and WorldMapFrame.overlayFrames[2] then
-            buttonContainer:SetPoint("RIGHT", WorldMapFrame.overlayFrames[2], "LEFT", -10, 0)
+            buttonContainer:SetPoint("RIGHT", WorldMapFrame.overlayFrames[2], "LEFT", -20, 0)
         else
             buttonContainer:SetPoint("TOPRIGHT", WorldMapFrame.BorderFrame, "TOPRIGHT", -10, -10)
         end

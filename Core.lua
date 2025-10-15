@@ -9,7 +9,8 @@ CityGuideConfig = CityGuideConfig or {
     displayMode = "labels", -- Options: "labels", "icons", "both"
     filterByProfession = false, -- Filter to show only player's professions
     labelSize = 1.0, -- Label size multiplier (1.0 = default)
-    iconSize = 1.0 -- Icon size multiplier (1.0 = default)
+    iconSize = 1.0, -- Icon size multiplier (1.0 = default)
+    enabledCities = {} -- Table of enabled cities by mapID (empty = all enabled)
 }
 
 -- Function to clear old labels
@@ -32,6 +33,12 @@ function CityGuide_UpdateMapLabels()
     
     -- Safety check: Make sure NPCData is loaded
     if not CityGuideNPCData then
+        return
+    end
+
+    -- Check if this city is enabled (default to enabled if not in config)
+    if CityGuideConfig.enabledCities[mapID] == false then
+        CityGuide_HideMapButton()
         return
     end
 

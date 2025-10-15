@@ -1,3 +1,11 @@
+-- Initialize config early to prevent errors
+CityGuideConfig = CityGuideConfig or {}
+CityGuideConfig.displayMode = CityGuideConfig.displayMode or "labels"
+CityGuideConfig.filterByProfession = CityGuideConfig.filterByProfession or false
+CityGuideConfig.labelSize = CityGuideConfig.labelSize or 1.0
+CityGuideConfig.iconSize = CityGuideConfig.iconSize or 1.0
+CityGuideConfig.enabledCities = CityGuideConfig.enabledCities or {}
+
 -- Create the settings panel
 local panel = CreateFrame("Frame", "CityGuideSettingsPanel", UIParent)
 panel.name = "City Guide"
@@ -11,6 +19,14 @@ title:SetText("City Guide Settings")
 local desc = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
 desc:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -8)
 desc:SetText("Configure how NPCs are displayed on the map")
+
+-- Map ID to City Name mapping
+local mapNames = {
+    [84] = "Stormwind",
+    [85] = "Orgrimmar",
+    [2339] = "Dornogal",
+    [627] = "Dalaran (Legion/Remix)"
+}
 
 -- Radio button helper function
 local function CreateRadioButton(parent, text, xOffset, yOffset)
@@ -80,9 +96,46 @@ bothButton:SetScript("OnClick", function()
     print("|cff00ff00City Guide:|r Switched to icons with labels mode!")
 end)
 
+-- Enabled Cities Section
+local citiesTitle = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+citiesTitle:SetPoint("TOPLEFT", bothButton, "BOTTOMLEFT", -20, -30)
+citiesTitle:SetText("Enabled Cities")
+
+-- Create city checkboxes dynamically
+local cityCheckboxes = {}
+local yOffset = -210
+for mapID, cityName in pairs(mapNames) do
+    local checkbox = CreateFrame("CheckButton", nil, panel, "UICheckButtonTemplate")
+    checkbox:SetPoint("TOPLEFT", panel, "TOPLEFT", 20, yOffset)
+    
+    local label = checkbox:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    label:SetPoint("LEFT", checkbox, "RIGHT", 5, 0)
+    label:SetText(cityName)
+    
+    checkbox.mapID = mapID
+    checkbox.label = label
+    
+    checkbox:SetScript("OnClick", function(self)
+        -- Initialize enabledCities if needed
+        CityGuideConfig.enabledCities = CityGuideConfig.enabledCities or {}
+        
+        CityGuideConfig.enabledCities[self.mapID] = self:GetChecked()
+        CityGuide_UpdateMapLabels()
+        
+        if self:GetChecked() then
+            print("|cff00ff00City Guide:|r " .. cityName .. " enabled")
+        else
+            print("|cff00ff00City Guide:|r " .. cityName .. " disabled")
+        end
+    end)
+    
+    cityCheckboxes[mapID] = checkbox
+    yOffset = yOffset - 30
+end
+
 -- Profession Filter Section
 local profFilterTitle = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-profFilterTitle:SetPoint("TOPLEFT", bothButton, "BOTTOMLEFT", -20, -30)
+profFilterTitle:SetPoint("TOPLEFT", panel, "TOPLEFT", 16, yOffset - 20)
 profFilterTitle:SetText("Profession Filter")
 
 local profFilterCheck = CreateFrame("CheckButton", nil, panel, "UICheckButtonTemplate")
@@ -113,7 +166,9 @@ local labelSizeTitle = panel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 labelSizeTitle:SetPoint("TOPLEFT", sizeTitle, "BOTTOMLEFT", 20, -20)
 labelSizeTitle:SetText("Label Size")
 
-local labelSizeSlider = CreateSlider(panel, "CityGuideLabelSizeSlider", 0.5, 2.0, 0.1, 20, -300)
+-- Calculate dynamic position for slider
+local sliderYOffset = yOffset - 160
+local labelSizeSlider = CreateSlider(panel, "CityGuideLabelSizeSlider", 0.5, 2.0, 0.1, 20, sliderYOffset)
 _G["CityGuideLabelSizeSliderText"]:Hide() -- Hide the default title
 
 local labelSizeValue = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
@@ -131,7 +186,7 @@ local iconSizeTitle = panel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 iconSizeTitle:SetPoint("TOPLEFT", labelSizeSlider, "BOTTOMLEFT", 0, -45)
 iconSizeTitle:SetText("Icon Size")
 
-local iconSizeSlider = CreateSlider(panel, "CityGuideIconSizeSlider", 0.5, 2.0, 0.1, 20, -365)
+local iconSizeSlider = CreateSlider(panel, "CityGuideIconSizeSlider", 0.5, 2.0, 0.1, 20, sliderYOffset - 65)
 _G["CityGuideIconSizeSliderText"]:Hide() -- Hide the default title
 
 local iconSizeValue = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
@@ -164,6 +219,19 @@ end)
 -- When panel is shown, update the controls
 panel:SetScript("OnShow", function()
     UpdateRadioButtons()
+    
+    -- Initialize enabledCities if needed
+    CityGuideConfig.enabledCities = CityGuideConfig.enabledCities or {}
+    
+    -- Update city checkboxes (default to enabled if not set)
+    for mapID, checkbox in pairs(cityCheckboxes) do
+        if CityGuideConfig.enabledCities[mapID] == nil then
+            checkbox:SetChecked(true) -- Default to enabled
+        else
+            checkbox:SetChecked(CityGuideConfig.enabledCities[mapID])
+        end
+    end
+    
     profFilterCheck:SetChecked(CityGuideConfig.filterByProfession)
     labelSizeSlider:SetValue(CityGuideConfig.labelSize or 1.0)
     iconSizeSlider:SetValue(CityGuideConfig.iconSize or 1.0)

@@ -12,20 +12,23 @@ CityGuideNPCData = {
     },
     [2339] = { -- Dornogal
         -- Main Services
-        {x = 45.42 / 100, y = 47.51 / 100, name = "Inn", icon = "Interface\\Icons\\INV_Misc_Food_15", noCluster = true}, 
+        {x = 45.42 / 100, y = 47.51 / 100, name = "Inn", icon = "Interface\\Icons\\inv_misc_rune_01", noCluster = true}, 
         {x = 52.50 / 100, y = 45.41 / 100, name = "Bank", icon = "Interface\\Icons\\INV_Misc_Bag_07", noCluster = true, textDirection = "right", color = "FFD700"}, 
         {x = 55.81 / 100, y = 48.60 / 100, name = "AH", icon = "Interface\\Icons\\INV_Misc_Coin_01", noCluster = true,},
         {x = 57.96 / 100, y = 56.48 / 100, name = "Orders", icon = "Interface\\Icons\\INV_Misc_Note_06", noCluster = true, textDirection = "right", labelDistance = 1.2},
         {x = 51.66 / 100, y = 42.06 / 100, name = "Upgrades", icon = "Interface\\Icons\\INV_Misc_QirajiCrystal_05", noCluster = true, textDirection = "left", labelDistance = 1.3},
         {x = 47.92 / 100, y = 67.89 / 100, name = "Rostrum", icon = "Interface\\Icons\\Ability_Mount_Drake_Azure", noCluster = true, textDirection = "left", labelDistance = 1.3},
-        {x = 44.60 / 100, y = 55.91 / 100, name = "TP", icon = "Interface\\Icons\\Tradingpostcurrency", noCluster = true},
+        {x = 44.60 / 100, y = 55.91 / 100, name = "Trading\nPost", icon = "Interface\\Icons\\Tradingpostcurrency", noCluster = true, color = "99CCFF"},
+        {x = 55.45 / 100, y = 77.18 / 100, name = "PvP", icon = "Interface\\Icons\\achievement_legionpvp2tier3", color = "FF2020"},
        
         -- Portals
-        {x = 41.11 / 100, y = 22.89 / 100, name = "Portal to SW", icon = "Interface\\Icons\\Spell_Arcane_PortalStormWind", noCluster = true},
+        {x = 41.11 / 100, y = 22.89 / 100, name = "Portals to SW", icon = "Interface\\Icons\\Spell_Arcane_PortalStormWind", noCluster = true},
         {x = 38.29 / 100, y = 27.13 / 100, name = "Portal to Org", icon = "Interface\\Icons\\Spell_Arcane_PortalOrgrimmar", noCluster = true},
         {x = 53.86 / 100, y = 38.72 / 100, name = "M+ Teleports", icon = "Interface\\Icons\\Spell_Shadow_Teleport", noCluster = true, textDirection = "top", labelDistance = 0.9},
        
         -- Profession Tables
+        {x = 44.15 / 100, y = 45.83 / 100, name = "Cook", icon = "Interface\\Icons\\INV_Misc_Food_15", color = "00FF00", noCluster = true, textDirection = "left"},
+        {x = 50.48 / 100, y = 26.84 / 100, name = "Fishing", icon = "Interface\\Icons\\ui_profession_fishing", color = "00FF00", noCluster = true, textDirection = "top"},
         {x = 47.28 / 100, y = 70.45 / 100, name = "Alch", icon = "Interface\\Icons\\Trade_Alchemy", color = "00FF00"},
         {x = 49.07 / 100, y = 63.20 / 100, name = "BS", icon = "Interface\\Icons\\Trade_BlackSmithing", color = "00FF00"},
         {x = 48.62 / 100, y = 71.16 / 100, name = "Insc", icon = "Interface\\Icons\\INV_Inscription_Tradeskill01", color = "00FF00"},
