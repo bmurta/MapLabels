@@ -5,13 +5,14 @@ local frame = CreateFrame("Frame")
 local activeLabels = {}
 
 -- Configuration
-CityGuideConfig = CityGuideConfig or {
-    displayMode = "labels", -- Options: "labels", "icons", "both"
-    filterByProfession = false, -- Filter to show only player's professions
-    labelSize = 1.0, -- Label size multiplier (1.0 = default)
-    iconSize = 1.0, -- Icon size multiplier (1.0 = default)
-    enabledCities = {} -- Table of enabled cities by mapID (empty = all enabled)
-}
+CityGuideConfig = CityGuideConfig or {}
+CityGuideConfig.displayMode = CityGuideConfig.displayMode or "labels"
+CityGuideConfig.filterByProfession = CityGuideConfig.filterByProfession or false
+CityGuideConfig.labelSize = CityGuideConfig.labelSize or 1.0
+CityGuideConfig.iconSize = CityGuideConfig.iconSize or 1.0
+CityGuideConfig.enabledCities = CityGuideConfig.enabledCities or {}
+CityGuideConfig.cityIconSizes = CityGuideConfig.cityIconSizes or {}
+CityGuideConfig.cityLabelSizes = CityGuideConfig.cityLabelSizes or {}
 
 -- Function to clear old labels
 local function ClearLabels()
@@ -53,13 +54,23 @@ function CityGuide_UpdateMapLabels()
     local canvas = WorldMapFrame:GetCanvas()
     local scale = CityGuide_GetMapScale(mapID)
     
+    -- Ensure cityIconSizes and cityLabelSizes tables exist
+    CityGuideConfig.cityIconSizes = CityGuideConfig.cityIconSizes or {}
+    CityGuideConfig.cityLabelSizes = CityGuideConfig.cityLabelSizes or {}
+    
+    -- Get per-city size multipliers (default to 1.0 if not set)
+    local cityIconMultiplier = CityGuideConfig.cityIconSizes[mapID] or 1.0
+    local cityLabelMultiplier = CityGuideConfig.cityLabelSizes[mapID] or 1.0
+    local finalIconSize = CityGuideConfig.iconSize * cityIconMultiplier
+    local finalLabelSize = CityGuideConfig.labelSize * cityLabelMultiplier
+    
     -- Apply profession filter
     local npcList = CityGuide_FilterNPCsByProfession(CityGuideNPCData[mapID])
 
     if CityGuideConfig.displayMode == "icons" then
         -- Icons only - NO CLUSTERING, use original positions
         for i, npc in ipairs(npcList) do
-            local label = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, scale, CityGuideConfig.iconSize)
+            local label = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, scale, finalIconSize)
             table.insert(activeLabels, label)
         end
         
@@ -71,14 +82,14 @@ function CityGuide_UpdateMapLabels()
             local centerX, centerY = CityGuide_GetClusterCenter(cluster)
             local labelText = CityGuide_GetClusterLabel(cluster)
             local color = cluster[1].color or "FFFFFF"
-            local label = CityGuide_CreateTextLabel(canvas, centerX, centerY, labelText, scale, "none", color, 1.0, CityGuideConfig.labelSize)
+            local label = CityGuide_CreateTextLabel(canvas, centerX, centerY, labelText, scale, "none", color, 1.0, finalLabelSize)
             table.insert(activeLabels, label)
         end
         
     else -- both
         -- Icons + Labels - Show all icons, then clustered labels
         for i, npc in ipairs(npcList) do
-            local icon = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, scale, CityGuideConfig.iconSize)
+            local icon = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, scale, finalIconSize)
             table.insert(activeLabels, icon)
         end
         
@@ -91,7 +102,7 @@ function CityGuide_UpdateMapLabels()
             local textDirection = cluster[1].textDirection or "down"
             local labelDistance = cluster[1].labelDistance or 1.0
             
-            local label = CityGuide_CreateTextLabel(canvas, centerX, centerY, labelText, scale, textDirection, color, labelDistance, CityGuideConfig.labelSize)
+            local label = CityGuide_CreateTextLabel(canvas, centerX, centerY, labelText, scale, textDirection, color, labelDistance, finalLabelSize)
             table.insert(activeLabels, label)
         end
     end
