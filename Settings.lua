@@ -9,9 +9,10 @@ CityGuideConfig.cityIconSizes = CityGuideConfig.cityIconSizes or {}
 CityGuideConfig.cityLabelSizes = CityGuideConfig.cityLabelSizes or {}
 
 -- Map ID to City Name mapping (ordered by latest expansion first)
-local cityOrder = {2339, 627, 85, 84} -- Dornogal, Dalaran, Orgrimmar, Stormwind
+local cityOrder = {2339, 2112, 627, 85, 84} -- Dornogal, Dalaran, Orgrimmar, Stormwind
 local mapNames = {
     [2339] = "Dornogal",
+    [2112] = "Valdrakken",
     [627] = "Dalaran (Legion/Remix)",
     [85] = "Orgrimmar",
     [84] = "Stormwind"

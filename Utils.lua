@@ -4,6 +4,7 @@
 local mapScales = {
     [2339] = 3.0,  -- Dornogal
     [627] = 1.2, -- Dalaran / Legion Remix
+    [2112] = 3.0, -- Valdrakken
     -- Add more maps here as needed
 }
 

@@ -48,5 +48,35 @@ CityGuideNPCData = {
         {x = 47.65 / 100, y = 89.17 / 100, name = "Remix vendors", icon = "ICON_PATH_HERE"},
          -- Profession 
         
+    },
+    [2112] = { -- Valdrakken (Dragonflight)
+        -- Main Services
+        {x = 55.18 / 100, y = 57.36 / 100, name = "Bank", icon = "Interface\\Icons\\INV_Misc_Bag_07", noCluster = true, color = "FFD700"},
+        {x = 42.65 / 100, y = 59.79 / 100, name = "AH", icon = "Interface\\Icons\\INV_Misc_Coin_01", noCluster = true, textDirection = "top"},
+        {x = 47.44 / 100, y = 46.66 / 100, name = "Inn\nCook", icon = "Interface\\Icons\\inv_misc_rune_01", noCluster = true},
+        {x = 34.86 / 100, y = 61.61 / 100, name = "Orders", icon = "Interface\\Icons\\INV_Misc_Note_06", noCluster = true, textDirection = "top"},
+        {x = 41.00 / 100, y = 44.20 / 100, name = "PvP", icon = "Interface\\Icons\\achievement_legionpvp2tier3", noCluster = true, color = "FF2020"},
+        {x = 44.24 / 100, y = 67.84 / 100, name = "Flight\nMaster", icon = "Interface\\Icons\\ability_mount_tawnywindrider"},
+        {x = 38.42 / 100, y = 37.21 / 100, name = "Primal\nVendors", icon = "Interface\\Icons\\ability_vehicle_electrocharge"},
+        {x = 46.90 / 100, y = 78.90 / 100, name = "Stable", icon = "Interface\\Icons\\classicon_hunter"},
+        
+        
+        -- Portals (in the Seat of the Aspects palace)
+        {x = 58.15 / 100, y = 40.05 / 100, name = "Portals", icon = "Interface\\Icons\\Spell_Arcane_PortalDalaran", noCluster = true},
+        {x = 26.04 / 100, y = 40.82 / 100, name = "Badlands Portal", icon = "Interface\\Icons\\Spell_Arcane_PortalOrgrimmar", textDirection = "top"},
+        
+        -- Dragonriding
+        {x = 25.03 / 100, y = 50.59 / 100, name = "Rostrum", icon = "Interface\\Icons\\Ability_Mount_Drake_Azure", noCluster = true, textDirection = "left", labelDistance = 1.3},
+        
+        -- Profession Trainers & Stations
+        {x = 44.89 / 100, y = 74.88 / 100, name = "Fishing", icon = "Interface\\Icons\\ui_profession_fishing", color = "00FF00", textDirection = "right", noCluster = true},
+        {x = 36.72 / 100, y = 72.20 / 100, name = "Alch", icon = "Interface\\Icons\\Trade_Alchemy", color = "00FF00"},
+        {x = 36.39 / 100, y = 50.24 / 100, name = "BS", icon = "Interface\\Icons\\Trade_BlackSmithing", color = "00FF00"},
+        {x = 30.83 / 100, y = 59.72 / 100, name = "Ench", icon = "Interface\\Icons\\Trade_Engraving", color = "00FF00"},
+        {x = 42.29 / 100, y = 48.83 / 100, name = "Engi", icon = "Interface\\Icons\\Trade_Engineering", color = "00FF00"},
+        {x = 39.61 / 100, y = 73.73 / 100, name = "Insc", icon = "Interface\\Icons\\INV_Inscription_Tradeskill01", color = "00FF00"},
+        {x = 40.81 / 100, y = 60.55 / 100, name = "JC", icon = "Interface\\Icons\\INV_Misc_Gem_01", color = "00FF00"},
+        {x = 28.52 / 100, y = 60.79 / 100, name = "LW", icon = "Interface\\Icons\\INV_Misc_ArmorKit_17", color = "00FF00", noCluster = true},
+        {x = 31.88 / 100, y = 67.68 / 100, name = "Tailor", icon = "Interface\\Icons\\Trade_Tailoring", color = "00FF00"},
     }
 }
