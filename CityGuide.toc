@@ -6,6 +6,7 @@
 ## SavedVariables: CityGuideConfig
 ## IconTexture: Interface\Icons\INV_Misc_Map02
 
+CityRegistry.lua
 NPCData.lua
 Utils.lua
 Clustering.lua

@@ -78,5 +78,14 @@ CityGuideNPCData = {
         {x = 40.81 / 100, y = 60.55 / 100, name = "JC", icon = "Interface\\Icons\\INV_Misc_Gem_01", color = "00FF00"},
         {x = 28.52 / 100, y = 60.79 / 100, name = "LW", icon = "Interface\\Icons\\INV_Misc_ArmorKit_17", color = "00FF00", noCluster = true},
         {x = 31.88 / 100, y = 67.68 / 100, name = "Tailor", icon = "Interface\\Icons\\Trade_Tailoring", color = "00FF00"},
-    }
+    },
+    [2472] = { -- Tazavesh (K'aresh)
+        {x = 40.65 / 100, y = 29.11 / 100, name = "Renown", icon = "Interface\\Icons\\ability_racial_etherealconnection"},
+        {x = 41.07 / 100, y = 25.16 / 100, name = "Inn", icon = "Interface\\Icons\\inv_misc_rune_01", textDirection = "top", noCluster = true},
+        {x = 47.36 / 100, y = 26.79 / 100, name = "Stable", icon = "Interface\\Icons\\classicon_hunter"},
+        {x = 48.99 / 100, y = 20.21 / 100, name = "Portals", icon = "Interface\\Icons\\spell_arcane_portaldalarancrater"},
+        {x = 43.52 / 100, y = 8.18 / 100, name = "Al'dani", icon = "Interface\\Icons\\inv_112_achievement_dungeon_ecodome"},
+        {x = 36.57 / 100, y = 13.51 / 100, name = "Tazavesh", icon = "Interface\\Icons\\achievement_dungeon_brokerdungeon"},
+        -- Add more NPCs here...
+    },
 }

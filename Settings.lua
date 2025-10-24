@@ -8,15 +8,9 @@ CityGuideConfig.enabledCities = CityGuideConfig.enabledCities or {}
 CityGuideConfig.cityIconSizes = CityGuideConfig.cityIconSizes or {}
 CityGuideConfig.cityLabelSizes = CityGuideConfig.cityLabelSizes or {}
 
--- Map ID to City Name mapping (ordered by latest expansion first)
-local cityOrder = {2339, 2112, 627, 85, 84} -- Dornogal, Dalaran, Orgrimmar, Stormwind
-local mapNames = {
-    [2339] = "Dornogal",
-    [2112] = "Valdrakken",
-    [627] = "Dalaran (Legion/Remix)",
-    [85] = "Orgrimmar",
-    [84] = "Stormwind"
-}
+-- Get city data from registry
+local cityOrder = CityGuide_GetCityOrder()
+local mapNames = CityGuide_GetCityNames()
 
 -- Create the main settings panel
 local panel = CreateFrame("Frame", "CityGuideSettingsPanel", UIParent)
