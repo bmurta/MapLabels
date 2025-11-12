@@ -60,7 +60,6 @@ CityGuideNPCData = {
         {x = 38.42 / 100, y = 37.21 / 100, name = "Primal\nVendors", icon = "Interface\\Icons\\ability_vehicle_electrocharge"},
         {x = 46.90 / 100, y = 78.90 / 100, name = "Stable", icon = "Interface\\Icons\\classicon_hunter"},
         
-        
         -- Portals (in the Seat of the Aspects palace)
         {x = 58.15 / 100, y = 40.05 / 100, name = "Portals", icon = "Interface\\Icons\\Spell_Arcane_PortalDalaran", noCluster = true},
         {x = 26.04 / 100, y = 40.82 / 100, name = "Badlands Portal", icon = "Interface\\Icons\\Spell_Arcane_PortalOrgrimmar", textDirection = "top"},
@@ -89,7 +88,25 @@ CityGuideNPCData = {
         {x = 46.80 / 100, y = 56.83 / 100, name = "Phase", icon = "Interface\\Icons\\spell_arcane_prismaticcloak"},
         {x = 38.64 / 100, y = 51.02 / 100, name = "Ky'veza", icon = "Interface\\Icons\\inv_achievement_raidnerubian_etherealassasin"},
    },
-     [2393] = {
-        {x = 50.81 / 100, y = 65.22 / 100, name = "Bank", icon = "Interface\\Icons\\INV_Misc_Bag_07", noCluster = true, color = "FFD700"},
+     [2393] = { --Silvermoon
+        {x = 49.93 / 100, y = 64.54 / 100, name = "Bank", icon = "Interface\\Icons\\INV_Misc_Bag_07", noCluster = true, color = "FFD700"},
+        {x = 53.37 / 100, y = 66.31 / 100, name = "Portals", icon = "Interface\\Icons\\spell_arcane_portaldalarancrater", noCluster = true},
+        {x = 56.28 / 100, y = 70.33 / 100, name = "Inn\nCook", icon = "Interface\\Icons\\inv_misc_rune_01", noCluster = true},
+        {x = 52.50 / 100, y = 78.21 / 100, name = "Delves", icon = "Interface\\Icons\\inv_achievement_raidnerubian_etherealassasin"},
+        {x = 72.56 / 100, y = 64.55 / 100, name = "Bank", icon = "Interface\\Icons\\INV_Misc_Bag_07", noCluster = true, color = "FFD700"},
+        {x = 45.05 / 100, y = 55.59 / 100, name = "Orders", icon = "Interface\\Icons\\INV_Misc_Note_06", noCluster = true},
+        {x = 42.03 / 100, y = 58.30 / 100, name = "M+ Teleports", icon = "Interface\\Icons\\Spell_Shadow_Teleport", noCluster = true, textDirection = "top", labelDistance = 0.9},
+        {x = 48.88 / 100, y = 78.15 / 100, name = "Trading\nPost", icon = "Interface\\Icons\\Tradingpostcurrency", noCluster = true, color = "99CCFF"},
+        {x = 34.09 / 100, y = 81.11 / 100, name = "PvP", icon = "Interface\\Icons\\achievement_legionpvp2tier3", color = "FF2020"},
+
+        -- Profession Tables
+        {x = 47.02 / 100, y = 51.88 / 100, name = "Alch", icon = "Interface\\Icons\\Trade_Alchemy", color = "00FF00", noCluster = true},
+        {x = 43.74 / 100, y = 51.33 / 100, name = "BS", icon = "Interface\\Icons\\Trade_BlackSmithing", color = "00FF00", noCluster = true},
+        {x = 46.78 / 100, y = 51.48 / 100, name = "Insc", icon = "Interface\\Icons\\INV_Inscription_Tradeskill01", color = "00FF00", noCluster = true},
+        {x = 47.97 / 100, y = 53.63 / 100, name = "Ench", icon = "Interface\\Icons\\Trade_Engraving", color = "00FF00"},
+        {x = 40.03 / 100, y = 52.83 / 100, name = "Engi", icon = "Interface\\Icons\\Trade_Engineering", color = "00FF00", noCluster = true},
+        {x = 47.93 / 100, y = 55.15 / 100, name = "Jewel", icon = "Interface\\Icons\\INV_Misc_Gem_01", color = "00FF00"},
+        {x = 43.15 / 100, y = 55.70 / 100, name = "LW", icon = "Interface\\Icons\\INV_Misc_ArmorKit_17", color = "00FF00", noCluster = true},
+        {x = 48.25 / 100, y = 54.15 / 100, name = "Tailor", icon = "Interface\\Icons\\Trade_Tailoring", color = "00FF00"},
     },
 }
