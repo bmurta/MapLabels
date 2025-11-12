@@ -5,6 +5,7 @@ CityGuideRegistry = {
     -- Each entry: {mapID, displayName, scale}
     -- Scale: affects label/icon sizing for that map (default 1.0 if not specified)
     
+    {2393, "Silvermoon", 3.0},
     {2339, "Dornogal", 3.0},
     {2472, "Tazavesh (K'aresh)", 1.0},
     {2112, "Valdrakken", 3.0},

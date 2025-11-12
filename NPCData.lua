@@ -88,6 +88,8 @@ CityGuideNPCData = {
         {x = 36.57 / 100, y = 13.51 / 100, name = "Tazavesh", icon = "Interface\\Icons\\achievement_dungeon_brokerdungeon"},
         {x = 46.80 / 100, y = 56.83 / 100, name = "Phase", icon = "Interface\\Icons\\spell_arcane_prismaticcloak"},
         {x = 38.64 / 100, y = 51.02 / 100, name = "Ky'veza", icon = "Interface\\Icons\\inv_achievement_raidnerubian_etherealassasin"},
-        -- Add more NPCs here...
+   },
+     [2393] = {
+        {x = 50.81 / 100, y = 65.22 / 100, name = "Bank", icon = "Interface\\Icons\\INV_Misc_Bag_07", noCluster = true, color = "FFD700"},
     },
 }
