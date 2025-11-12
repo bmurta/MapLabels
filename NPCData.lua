@@ -86,6 +86,8 @@ CityGuideNPCData = {
         {x = 48.99 / 100, y = 20.21 / 100, name = "Portals", icon = "Interface\\Icons\\spell_arcane_portaldalarancrater"},
         {x = 43.52 / 100, y = 8.18 / 100, name = "Al'dani", icon = "Interface\\Icons\\inv_112_achievement_dungeon_ecodome"},
         {x = 36.57 / 100, y = 13.51 / 100, name = "Tazavesh", icon = "Interface\\Icons\\achievement_dungeon_brokerdungeon"},
+        {x = 46.80 / 100, y = 56.83 / 100, name = "Phase", icon = "Interface\\Icons\\spell_arcane_prismaticcloak"},
+        {x = 38.64 / 100, y = 51.02 / 100, name = "Ky'veza", icon = "Interface\\Icons\\inv_achievement_raidnerubian_etherealassasin"},
         -- Add more NPCs here...
     },
 }
