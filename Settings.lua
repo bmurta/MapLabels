@@ -7,10 +7,13 @@ CityGuideConfig.iconSize = CityGuideConfig.iconSize or 1.0
 CityGuideConfig.enabledCities = CityGuideConfig.enabledCities or {}
 CityGuideConfig.cityIconSizes = CityGuideConfig.cityIconSizes or {}
 CityGuideConfig.cityLabelSizes = CityGuideConfig.cityLabelSizes or {}
+CityGuideConfig.condenseProfessions = CityGuideConfig.condenseProfessions or {}
 
 -- Get city data from registry
 local cityOrder = CityGuide_GetCityOrder()
 local mapNames = CityGuide_GetCityNames()
+local allowCondensation = CityGuide_GetCityAllowsProfessionCondensation()
+local defaultCondensation = CityGuide_GetCityDefaultCondensation()
 
 -- Create the main settings panel
 local panel = CreateFrame("Frame", "CityGuideSettingsPanel", UIParent)
@@ -103,8 +106,7 @@ local navCategories = {
     {name = "General", id = "general"},
     {name = "Display", id = "display"},
     {name = "Size Settings", id = "sizes"},
-    {name = "Per-City Icons", id = "percityicons"},
-    {name = "Per-City Labels", id = "percitylabels"}
+    {name = "Per-City Settings", id = "percity"}
 }
 
 local navButtons = {}
@@ -344,59 +346,132 @@ resetButton:SetPoint("TOPLEFT", iconSizeSlider, "BOTTOMLEFT", 0, -30)
 resetButton:SetText("Reset All Sizes")
 
 -- ========================================
--- PER-CITY ICONS SECTION
+-- PER-CITY SETTINGS SECTION (Combined)
 -- ========================================
 local perCitySection = CreateFrame("Frame", nil, scrollChild)
 perCitySection:SetPoint("TOPLEFT", 20, -20)
 perCitySection:SetPoint("TOPRIGHT", -20, -20)
-perCitySection:SetHeight(400)
-contentSections["percityicons"] = perCitySection
+perCitySection:SetHeight(2000) -- Make it tall enough for all cities
+contentSections["percity"] = perCitySection
 
 local perCityTitle = perCitySection:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
 perCityTitle:SetPoint("TOPLEFT", 0, 0)
-perCityTitle:SetText("Per-City Icon Size")
+perCityTitle:SetText("Per-City Settings")
 
 local perCityDesc = perCitySection:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
 perCityDesc:SetPoint("TOPLEFT", perCityTitle, "BOTTOMLEFT", 0, -5)
-perCityDesc:SetText("Adjust icon size for individual cities (multiplied by global icon size)")
+perCityDesc:SetText("Adjust settings for individual cities")
 perCityDesc:SetWidth(400)
 perCityDesc:SetJustifyH("LEFT")
 
--- Create per-city sliders
+-- Storage for all per-city controls
 local cityIconSliders = {}
 local cityIconSizeValues = {}
+local cityLabelSliders = {}
+local cityLabelSizeValues = {}
+local cityProfessionCheckboxes = {}
+
 local perCityYOffset = -80
 
 for _, mapID in ipairs(cityOrder) do
     local cityName = mapNames[mapID]
-    local cityTitle = perCitySection:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    cityTitle:SetPoint("TOPLEFT", 0, perCityYOffset)
-    cityTitle:SetText(cityName .. " Icon Size")
     
-    local citySlider = CreateSlider(perCitySection, "CityGuide"..cityName:gsub("[^%w]", "").."IconSlider", 0.5, 2.0, 0.1, 0, perCityYOffset - 20, 300)
+    -- City name header
+    local cityHeader = perCitySection:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+    cityHeader:SetPoint("TOPLEFT", 0, perCityYOffset)
+    cityHeader:SetText(cityName)
+    cityHeader:SetTextColor(1, 0.82, 0) -- Gold color
+    perCityYOffset = perCityYOffset - 30
+    
+    -- Icon Size Slider
+    local iconLabel = perCitySection:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    iconLabel:SetPoint("TOPLEFT", 20, perCityYOffset)
+    iconLabel:SetText("Icon Size")
+    
+    local iconSlider = CreateSlider(perCitySection, "CityGuide"..cityName:gsub("[^%w]", "").."IconSlider", 0.5, 2.0, 0.1, 20, perCityYOffset - 20, 250)
     _G["CityGuide"..cityName:gsub("[^%w]", "").."IconSliderText"]:Hide()
     
-    local cityValue = perCitySection:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-    cityValue:SetPoint("TOP", citySlider, "BOTTOM", 0, 0)
-    cityValue:SetText("1.0x")
+    local iconValue = perCitySection:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+    iconValue:SetPoint("TOP", iconSlider, "BOTTOM", 0, 0)
+    iconValue:SetText("1.0x")
     
-    citySlider:SetScript("OnValueChanged", function(self, value)
+    iconSlider:SetScript("OnValueChanged", function(self, value)
         CityGuideConfig.cityIconSizes[mapID] = value
-        cityValue:SetText(string.format("%.1fx", value))
+        iconValue:SetText(string.format("%.1fx", value))
         CityGuide_UpdateMapLabels()
     end)
     
-    cityIconSliders[mapID] = citySlider
-    cityIconSizeValues[mapID] = cityValue
-    perCityYOffset = perCityYOffset - 75
+    cityIconSliders[mapID] = iconSlider
+    cityIconSizeValues[mapID] = iconValue
+    perCityYOffset = perCityYOffset - 65
+    
+    -- Label Size Slider
+    local labelLabel = perCitySection:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    labelLabel:SetPoint("TOPLEFT", 20, perCityYOffset)
+    labelLabel:SetText("Label Size")
+    
+    local labelSlider = CreateSlider(perCitySection, "CityGuide"..cityName:gsub("[^%w]", "").."LabelSlider", 0.5, 2.0, 0.1, 20, perCityYOffset - 20, 250)
+    _G["CityGuide"..cityName:gsub("[^%w]", "").."LabelSliderText"]:Hide()
+    
+    local labelValue = perCitySection:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+    labelValue:SetPoint("TOP", labelSlider, "BOTTOM", 0, 0)
+    labelValue:SetText("1.0x")
+    
+    labelSlider:SetScript("OnValueChanged", function(self, value)
+        CityGuideConfig.cityLabelSizes = CityGuideConfig.cityLabelSizes or {}
+        CityGuideConfig.cityLabelSizes[mapID] = value
+        labelValue:SetText(string.format("%.1fx", value))
+        CityGuide_UpdateMapLabels()
+    end)
+    
+    cityLabelSliders[mapID] = labelSlider
+    cityLabelSizeValues[mapID] = labelValue
+    perCityYOffset = perCityYOffset - 65
+    
+    -- Condense Profession Tables Checkbox (only if city allows it)
+    if allowCondensation[mapID] == true then
+        local profCheckbox = CreateFrame("CheckButton", nil, perCitySection, "UICheckButtonTemplate")
+        profCheckbox:SetPoint("TOPLEFT", 20, perCityYOffset)
+        
+        local profLabel = profCheckbox:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+        profLabel:SetPoint("LEFT", profCheckbox, "RIGHT", 5, 0)
+        profLabel:SetText("Condense Profession Tables")
+        
+        profCheckbox.mapID = mapID
+        profCheckbox:SetScript("OnClick", function(self)
+            CityGuideConfig.condenseProfessions = CityGuideConfig.condenseProfessions or {}
+            CityGuideConfig.condenseProfessions[self.mapID] = self:GetChecked()
+            CityGuide_UpdateMapLabels()
+        end)
+        
+        profCheckbox:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetText("Condense Profession Tables")
+            GameTooltip:AddLine("Groups all profession trainers into a single 'Profession Tables' label", 1, 1, 1, true)
+            GameTooltip:AddLine(" ", 1, 1, 1)
+            GameTooltip:AddLine("Note: Overridden by 'Filter My Professions' - when that's active, your professions show individually", 0.8, 0.8, 0.8, true)
+            GameTooltip:Show()
+        end)
+        
+        profCheckbox:SetScript("OnLeave", function()
+            GameTooltip:Hide()
+        end)
+        
+        cityProfessionCheckboxes[mapID] = profCheckbox
+        perCityYOffset = perCityYOffset - 50
+    end
+    
+    -- Separator line
+    perCityYOffset = perCityYOffset - 20
 end
 
--- Update reset button to include per-city sizes
+-- Update reset button to include per-city sizes and profession condensation
 resetButton:SetScript("OnClick", function()
     CityGuideConfig.labelSize = 1.0
     CityGuideConfig.iconSize = 1.0
     CityGuideConfig.cityIconSizes = {}
     CityGuideConfig.cityLabelSizes = {}
+    CityGuideConfig.condenseProfessions = {}
     labelSizeSlider:SetValue(1.0)
     iconSizeSlider:SetValue(1.0)
     labelSizeValue:SetText("1.0x")
@@ -412,58 +487,13 @@ resetButton:SetScript("OnClick", function()
         cityLabelSizeValues[mapID]:SetText("1.0x")
     end
     
+    for mapID, checkbox in pairs(cityProfessionCheckboxes) do
+        checkbox:SetChecked(false)
+    end
+    
     CityGuide_UpdateMapLabels()
     print("|cff00ff00City Guide:|r All sizes reset to default")
 end)
-
--- ========================================
--- PER-CITY LABELS SECTION
--- ========================================
-local perCityLabelSection = CreateFrame("Frame", nil, scrollChild)
-perCityLabelSection:SetPoint("TOPLEFT", 20, -20)
-perCityLabelSection:SetPoint("TOPRIGHT", -20, -20)
-perCityLabelSection:SetHeight(400)
-contentSections["percitylabels"] = perCityLabelSection
-
-local perCityLabelTitle = perCityLabelSection:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-perCityLabelTitle:SetPoint("TOPLEFT", 0, 0)
-perCityLabelTitle:SetText("Per-City Label Size")
-
-local perCityLabelDesc = perCityLabelSection:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-perCityLabelDesc:SetPoint("TOPLEFT", perCityLabelTitle, "BOTTOMLEFT", 0, -5)
-perCityLabelDesc:SetText("Adjust label size for individual cities (multiplied by global label size)")
-perCityLabelDesc:SetWidth(400)
-perCityLabelDesc:SetJustifyH("LEFT")
-
--- Create per-city label sliders
-local cityLabelSliders = {}
-local cityLabelSizeValues = {}
-local perCityLabelYOffset = -80
-
-for _, mapID in ipairs(cityOrder) do
-    local cityName = mapNames[mapID]
-    local cityTitle = perCityLabelSection:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    cityTitle:SetPoint("TOPLEFT", 0, perCityLabelYOffset)
-    cityTitle:SetText(cityName .. " Label Size")
-    
-    local citySlider = CreateSlider(perCityLabelSection, "CityGuide"..cityName:gsub("[^%w]", "").."LabelSlider", 0.5, 2.0, 0.1, 0, perCityLabelYOffset - 20, 300)
-    _G["CityGuide"..cityName:gsub("[^%w]", "").."LabelSliderText"]:Hide()
-    
-    local cityValue = perCityLabelSection:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-    cityValue:SetPoint("TOP", citySlider, "BOTTOM", 0, 0)
-    cityValue:SetText("1.0x")
-    
-    citySlider:SetScript("OnValueChanged", function(self, value)
-        CityGuideConfig.cityLabelSizes = CityGuideConfig.cityLabelSizes or {}
-        CityGuideConfig.cityLabelSizes[mapID] = value
-        cityValue:SetText(string.format("%.1fx", value))
-        CityGuide_UpdateMapLabels()
-    end)
-    
-    cityLabelSliders[mapID] = citySlider
-    cityLabelSizeValues[mapID] = cityValue
-    perCityLabelYOffset = perCityLabelYOffset - 75
-end
 
 -- Update function when panel is shown
 panel:SetScript("OnShow", function()
@@ -495,6 +525,18 @@ panel:SetScript("OnShow", function()
         local citySize = CityGuideConfig.cityLabelSizes[mapID] or 1.0
         slider:SetValue(citySize)
         cityLabelSizeValues[mapID]:SetText(string.format("%.1fx", citySize))
+    end
+    
+    -- Apply defaults and update checkboxes for profession condensation
+    CityGuideConfig.condenseProfessions = CityGuideConfig.condenseProfessions or {}
+    for mapID, checkbox in pairs(cityProfessionCheckboxes) do
+        if checkbox then
+            -- If this is first time and no saved value, apply default
+            if CityGuideConfig.condenseProfessions[mapID] == nil then
+                CityGuideConfig.condenseProfessions[mapID] = defaultCondensation[mapID] or false
+            end
+            checkbox:SetChecked(CityGuideConfig.condenseProfessions[mapID])
+        end
     end
     
     ShowSection("general")

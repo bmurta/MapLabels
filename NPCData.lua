@@ -91,3 +91,21 @@ CityGuideNPCData = {
         -- Add more NPCs here...
     },
 }
+
+-- Profession Hub Markers (optional - define custom position for "Profession Tables" label)
+-- Only ONE hub per map. If not defined, the system will automatically calculate center of all professions.
+CityGuideProfessionHubs = {
+    [2339] = { -- Dornogal
+        x = 52.29 / 100,  -- Where you want the label to appear
+        y = 71.34 / 100,
+        name = "Profession Tables",  -- optional, defaults to "Profession Tables"
+        color = "00FF00",  -- optional, defaults to green
+        textDirection = "none",  -- optional: "none", "left", "right", "top", "down"
+        labelDistance = 1.0  -- optional, defaults to 1.0
+    },
+    [2112] = { -- Valdrakken
+        x = 35.00 / 100,
+        y = 60.00 / 100,
+        name = "Profession Tables"
+    },
+}
