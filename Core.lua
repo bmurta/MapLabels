@@ -72,9 +72,16 @@ function CityGuide_UpdateMapLabels()
     local filteredNPCList = CityGuide_FilterNPCsByProfession(fullNPCList)
 
     if CityGuideConfig.displayMode == "icons" then
-        -- Icons only - NO CLUSTERING, use original positions
+        -- Icons only - NO CLUSTERING, use original positions, regular square icons
         for i, npc in ipairs(filteredNPCList) do
-            local label = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, scale, finalIconSize)
+            local label = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, nil, scale, finalIconSize)
+            table.insert(activeLabels, label)
+        end
+        
+    elseif CityGuideConfig.displayMode == "smallicons" then
+        -- Small Icons only - NO CLUSTERING, use original positions, minimap style
+        for i, npc in ipairs(filteredNPCList) do
+            local label = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, npc.minimapIcon, scale, finalIconSize)
             table.insert(activeLabels, label)
         end
         
@@ -113,11 +120,53 @@ function CityGuide_UpdateMapLabels()
             table.insert(activeLabels, label)
         end
         
-    else -- both
-        -- Icons + Labels mode
+    elseif CityGuideConfig.displayMode == "both" then
+        -- Icons + Labels mode (regular square icons)
         -- IMPORTANT: Show icons for FILTERED list (respects profession filter)
         for i, npc in ipairs(filteredNPCList) do
-            local icon = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, scale, finalIconSize)
+            local icon = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, nil, scale, finalIconSize)
+            table.insert(activeLabels, icon)
+        end
+        
+        -- Cluster the FILTERED list (respects profession filter)
+        local clusters = CityGuide_ClusterNPCs(filteredNPCList)
+        
+        -- Apply profession condensation if enabled for this map
+        -- BUT NOT if profession filter is active (show individual professions for user's profs)
+        if CityGuideConfig.condenseProfessions[mapID] and not CityGuideConfig.filterByProfession then
+            -- Get profession hub if defined
+            local professionHub = CityGuideProfessionHubs and CityGuideProfessionHubs[mapID]
+            clusters = CityGuide_CondenseProfessionClusters(clusters, professionHub)
+        end
+        
+        for _, cluster in ipairs(clusters) do
+            local centerX, centerY
+            local color, textDirection, labelDistance
+            
+            -- Check if this is a profession hub with custom position
+            if cluster.isProfessionHub and cluster.professionHubX then
+                centerX = cluster.professionHubX
+                centerY = cluster.professionHubY
+                color = cluster.professionHubColor or "00FF00"
+                textDirection = cluster.professionHubTextDirection or "down"
+                labelDistance = cluster.professionHubLabelDistance or 1.0
+            else
+                centerX, centerY = CityGuide_GetClusterCenter(cluster)
+                color = cluster[1].color or "FFFFFF"
+                textDirection = cluster[1].textDirection or "down"
+                labelDistance = cluster[1].labelDistance or 1.0
+            end
+            
+            local labelText = CityGuide_GetClusterLabel(cluster)
+            local label = CityGuide_CreateTextLabel(canvas, centerX, centerY, labelText, scale, textDirection, color, labelDistance, finalLabelSize)
+            table.insert(activeLabels, label)
+        end
+        
+    elseif CityGuideConfig.displayMode == "smallboth" then
+        -- Small Icons + Labels mode (minimap style with glow)
+        -- IMPORTANT: Show icons for FILTERED list (respects profession filter)
+        for i, npc in ipairs(filteredNPCList) do
+            local icon = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, npc.minimapIcon, scale, finalIconSize)
             table.insert(activeLabels, icon)
         end
         

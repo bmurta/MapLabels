@@ -201,6 +201,10 @@ local function HandleSlashCommand(msg)
             CityGuideConfig.displayMode = "icons"
         elseif CityGuideConfig.displayMode == "icons" then
             CityGuideConfig.displayMode = "both"
+        elseif CityGuideConfig.displayMode == "both" then
+            CityGuideConfig.displayMode = "smallicons"
+        elseif CityGuideConfig.displayMode == "smallicons" then
+            CityGuideConfig.displayMode = "smallboth"
         else
             CityGuideConfig.displayMode = "labels"
         end

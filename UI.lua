@@ -9,7 +9,9 @@ local buttonContainer = nil
 local modeIcons = {
     labels = "Interface\\Icons\\INV_Inscription_Scroll",  -- Scroll icon for text
     icons = "Interface\\Icons\\Ability_Spy",              -- Spyglass for viewing/finding
-    both = "Interface\\Icons\\INV_Misc_Map02"             -- Map icon for both
+    both = "Interface\\Icons\\INV_Misc_Map02",             -- Map icon for both
+    smallicons = "Interface\\Minimap\\Tracking\\Banker",   -- Small icon style
+    smallboth = "Interface\\Icons\\INV_Misc_Map_01"        -- Small icons with labels
 }
 
 -- Function to create a label (text only)
@@ -96,23 +98,47 @@ function CityGuide_CreateTextLabel(parent, x, y, text, scale, textDirection, col
 end
 
 -- Function to create icon only
-function CityGuide_CreateIconOnly(parent, x, y, iconPath, scale, sizeMultiplier)
+function CityGuide_CreateIconOnly(parent, x, y, iconPath, minimapIcon, scale, sizeMultiplier)
     scale = scale or 1.0
     sizeMultiplier = sizeMultiplier or 1.0
     
     local finalScale = scale * sizeMultiplier
     
+    -- Check display mode
+    local displayMode = CityGuideConfig.displayMode or "labels"
+    local useSmallIcons = (displayMode == "smallicons" or displayMode == "smallboth")
+    
+    -- Minimap icons are larger (28px) than square icons (24px)
+    local iconSize = useSmallIcons and (30 * finalScale) or (24 * finalScale)
+    
     local container = CreateFrame("Frame", nil, parent)
-    local iconSize = 24 * finalScale
     container:SetSize(iconSize, iconSize)
 
     container:SetFrameStrata("HIGH")
     container:SetFrameLevel(9999)
     
-    local icon = container:CreateTexture(nil, "ARTWORK")
-    icon:SetSize(iconSize, iconSize)
-    icon:SetTexture(iconPath)
-    icon:SetPoint("CENTER")
+    if useSmallIcons and minimapIcon then
+        -- Create circular glow background for small icons
+        local glow = container:CreateTexture(nil, "BACKGROUND")
+        glow:SetSize(iconSize * 2.4, iconSize * 2.4)
+        glow:SetPoint("CENTER")
+        -- Using a simple white texture with radial gradient effect
+        glow:SetTexture("Interface\\GLUES\\Models\\UI_Draenei\\GenericGlow64")
+        glow:SetVertexColor(1, 1, 0.8, 0.5) -- Warm white, 50% opacity
+        glow:SetBlendMode("ADD")
+        
+        -- Main icon
+        local icon = container:CreateTexture(nil, "ARTWORK")
+        icon:SetSize(iconSize, iconSize)
+        icon:SetPoint("CENTER")
+        icon:SetTexture(minimapIcon)
+    else
+        -- Use square icon (regular icons mode) - no glow
+        local icon = container:CreateTexture(nil, "ARTWORK")
+        icon:SetSize(iconSize, iconSize)
+        icon:SetPoint("CENTER")
+        icon:SetTexture(iconPath)
+    end
 
     local mapWidth = parent:GetWidth()
     local mapHeight = parent:GetHeight()
@@ -198,7 +224,7 @@ function CityGuide_CreateOrUpdateMapButton()
         local modeIcon = mapButton:CreateTexture(nil, "ARTWORK")
         modeIcon:SetSize(20, 20)
         modeIcon:SetPoint("CENTER")
-        modeIcon:SetTexture(modeIcons[CityGuideConfig.displayMode])
+        modeIcon:SetTexture(modeIcons[CityGuideConfig.displayMode] or modeIcons["labels"])
         mapButton.icon = modeIcon
         
         mapButton:SetScript("OnClick", function(self)
@@ -206,12 +232,16 @@ function CityGuide_CreateOrUpdateMapButton()
                 CityGuideConfig.displayMode = "icons"
             elseif CityGuideConfig.displayMode == "icons" then
                 CityGuideConfig.displayMode = "both"
+            elseif CityGuideConfig.displayMode == "both" then
+                CityGuideConfig.displayMode = "smallicons"
+            elseif CityGuideConfig.displayMode == "smallicons" then
+                CityGuideConfig.displayMode = "smallboth"
             else
                 CityGuideConfig.displayMode = "labels"
             end
             
             -- Update icon immediately
-            self.icon:SetTexture(modeIcons[CityGuideConfig.displayMode])
+            self.icon:SetTexture(modeIcons[CityGuideConfig.displayMode] or modeIcons["labels"])
             CityGuide_UpdateMapLabels()
             
             -- Force refresh tooltip if it's showing
@@ -222,7 +252,9 @@ function CityGuide_CreateOrUpdateMapButton()
             
             local modeName = CityGuideConfig.displayMode == "labels" and "Labels Only" or
                             CityGuideConfig.displayMode == "icons" and "Icons Only" or
-                            "Icons with Labels"
+                            CityGuideConfig.displayMode == "both" and "Icons with Labels" or
+                            CityGuideConfig.displayMode == "smallicons" and "Small Icons" or
+                            "Small Icons with Labels"
             print("|cff00ff00City Guide:|r " .. modeName)
         end)
         
@@ -231,7 +263,9 @@ function CityGuide_CreateOrUpdateMapButton()
             
             local modeName = CityGuideConfig.displayMode == "labels" and "Labels Only" or
                             CityGuideConfig.displayMode == "icons" and "Icons Only" or
-                            "Icons with Labels"
+                            CityGuideConfig.displayMode == "both" and "Icons with Labels" or
+                            CityGuideConfig.displayMode == "smallicons" and "Small Icons" or
+                            "Small Icons with Labels"
             
             GameTooltip:SetOwner(self, "ANCHOR_LEFT")
             GameTooltip:SetText("City Guide Display")
@@ -251,7 +285,7 @@ function CityGuide_CreateOrUpdateMapButton()
     profFilterButton:SetChecked(CityGuideConfig.filterByProfession)
     
     -- Update mode icon
-    mapButton.icon:SetTexture(modeIcons[CityGuideConfig.displayMode])
+    mapButton.icon:SetTexture(modeIcons[CityGuideConfig.displayMode] or modeIcons["labels"])
     
     buttonContainer:Show()
 end

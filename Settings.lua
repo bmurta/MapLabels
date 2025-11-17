@@ -244,7 +244,7 @@ end)
 local displaySection = CreateFrame("Frame", nil, scrollChild)
 displaySection:SetPoint("TOPLEFT", 20, -20)
 displaySection:SetPoint("TOPRIGHT", -20, -20)
-displaySection:SetHeight(200)
+displaySection:SetHeight(250)
 contentSections["display"] = displaySection
 
 local displayTitle = displaySection:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
@@ -259,11 +259,15 @@ displayDesc:SetText("Choose how to display NPCs on the map")
 local labelsButton = CreateRadioButton(displaySection, "Labels Only", 0, -60)
 local iconsButton = CreateRadioButton(displaySection, "Icons Only", 0, -90)
 local bothButton = CreateRadioButton(displaySection, "Icons with Labels", 0, -120)
+local smallIconsButton = CreateRadioButton(displaySection, "Small Icons", 0, -150)
+local smallBothButton = CreateRadioButton(displaySection, "Small Icons with Labels", 0, -180)
 
 local function UpdateRadioButtons()
     labelsButton:SetChecked(CityGuideConfig.displayMode == "labels")
     iconsButton:SetChecked(CityGuideConfig.displayMode == "icons")
     bothButton:SetChecked(CityGuideConfig.displayMode == "both")
+    smallIconsButton:SetChecked(CityGuideConfig.displayMode == "smallicons")
+    smallBothButton:SetChecked(CityGuideConfig.displayMode == "smallboth")
 end
 
 labelsButton:SetScript("OnClick", function()
@@ -284,13 +288,25 @@ bothButton:SetScript("OnClick", function()
     CityGuide_UpdateMapLabels()
 end)
 
+smallIconsButton:SetScript("OnClick", function()
+    CityGuideConfig.displayMode = "smallicons"
+    UpdateRadioButtons()
+    CityGuide_UpdateMapLabels()
+end)
+
+smallBothButton:SetScript("OnClick", function()
+    CityGuideConfig.displayMode = "smallboth"
+    UpdateRadioButtons()
+    CityGuide_UpdateMapLabels()
+end)
+
 -- ========================================
 -- SIZE SETTINGS SECTION
 -- ========================================
 local sizesSection = CreateFrame("Frame", nil, scrollChild)
 sizesSection:SetPoint("TOPLEFT", 20, -20)
 sizesSection:SetPoint("TOPRIGHT", -20, -20)
-sizesSection:SetHeight(300)
+sizesSection:SetHeight(400)
 contentSections["sizes"] = sizesSection
 
 local sizesTitle = sizesSection:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
