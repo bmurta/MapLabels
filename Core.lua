@@ -91,6 +91,7 @@ function CityGuide_UpdateMapLabels()
         
         -- Apply profession condensation if enabled for this map
         -- BUT NOT if profession filter is active (show individual professions for user's profs)
+        CityGuideConfig.condenseProfessions = CityGuideConfig.condenseProfessions or {}
         if CityGuideConfig.condenseProfessions[mapID] and not CityGuideConfig.filterByProfession then
             -- Get profession hub if defined
             local professionHub = CityGuideProfessionHubs and CityGuideProfessionHubs[mapID]
@@ -133,6 +134,7 @@ function CityGuide_UpdateMapLabels()
         
         -- Apply profession condensation if enabled for this map
         -- BUT NOT if profession filter is active (show individual professions for user's profs)
+        CityGuideConfig.condenseProfessions = CityGuideConfig.condenseProfessions or {}
         if CityGuideConfig.condenseProfessions[mapID] and not CityGuideConfig.filterByProfession then
             -- Get profession hub if defined
             local professionHub = CityGuideProfessionHubs and CityGuideProfessionHubs[mapID]
@@ -175,6 +177,7 @@ function CityGuide_UpdateMapLabels()
         
         -- Apply profession condensation if enabled for this map
         -- BUT NOT if profession filter is active (show individual professions for user's profs)
+        CityGuideConfig.condenseProfessions = CityGuideConfig.condenseProfessions or {}
         if CityGuideConfig.condenseProfessions[mapID] and not CityGuideConfig.filterByProfession then
             -- Get profession hub if defined
             local professionHub = CityGuideProfessionHubs and CityGuideProfessionHubs[mapID]

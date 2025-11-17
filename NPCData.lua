@@ -609,8 +609,8 @@ CityGuideNPCData = {
         x = 52.50 / 100, 
         y = 78.21 / 100, 
         name = "Delves", 
-        icon = "Interface\\Icons\\inv_achievement_raidnerubian_etherealassasin",
-        minimapIcon = MINIMAP_ICONS.QUESTGIVER
+        icon = "Interface\\Icons\\ui_delves",
+        minimapIcon = "Interface\\Icons\\ui_delves"
     },
     {
         x = 45.05 / 100, 
@@ -627,15 +627,13 @@ CityGuideNPCData = {
         icon = "Interface\\Icons\\Spell_Shadow_Teleport", 
         minimapIcon = MINIMAP_ICONS.PORTAL_MYTHIC,
         noCluster = true, 
-        textDirection = "top", 
-        labelDistance = 0.9
     },
     {
         x = 48.88 / 100, 
         y = 78.15 / 100, 
-        name = "Trading\nPost", 
+        name = "TP", 
         icon = "Interface\\Icons\\Tradingpostcurrency", 
-        minimapIcon = MINIMAP_ICONS.FOCUS,
+        minimapIcon = "Interface\\Icons\\Tradingpostcurrency",
         noCluster = true, 
         color = "99CCFF"
     },
@@ -724,9 +722,7 @@ CityGuideNPCData = {
 -- Profession Hub Markers (optional - define custom position for "Profession Tables" label)
 -- Only ONE hub per map. If not defined, the system will automatically calculate center of all professions.
 CityGuideProfessionHubs = {
-    [2393] = { 
-        x = 46.78 / 100,  -- Where you want the label to appear
-        y = 51.48 / 100,
+    [2393] = {x = 45.67 / 100, y = 48.91 / 100,
         name = "Profession Tables",  -- optional, defaults to "Profession Tables"
         color = "00FF00",  -- optional, defaults to green
         textDirection = "none",  -- optional: "none", "left", "right", "top", "down"
