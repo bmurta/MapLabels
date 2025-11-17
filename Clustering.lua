@@ -32,6 +32,11 @@ end
 
 -- Function to generate cluster label text
 function CityGuide_GetClusterLabel(cluster)
+    -- Check if this is a condensed profession hub
+    if cluster.isProfessionHub then
+        return cluster.professionHubName or "Profession Tables"
+    end
+    
     if #cluster == 1 then
         return cluster[1].name
     end
@@ -99,4 +104,44 @@ function CityGuide_ClusterNPCs(npcList, clusterRadius)
     end
     
     return clusters
+end
+
+-- Function to condense profession clusters into single "Profession Tables" label
+function CityGuide_CondenseProfessionClusters(clusters, professionHub)
+    local condensedClusters = {}
+    local allProfessionNPCs = {}
+    
+    -- Collect all profession NPCs from all clusters
+    for _, cluster in ipairs(clusters) do
+        if AreAllProfessions(cluster) then
+            for _, npc in ipairs(cluster) do
+                table.insert(allProfessionNPCs, npc)
+            end
+        else
+            -- Non-profession cluster, keep as-is
+            table.insert(condensedClusters, cluster)
+        end
+    end
+    
+    -- If we have profession NPCs, create a single condensed cluster
+    if #allProfessionNPCs > 0 then
+        local profCluster = allProfessionNPCs
+        profCluster.isProfessionHub = true
+        
+        -- Use manual hub settings if provided
+        if professionHub then
+            profCluster.professionHubName = professionHub.name or "Profession Tables"
+            profCluster.professionHubX = professionHub.x
+            profCluster.professionHubY = professionHub.y
+            profCluster.professionHubColor = professionHub.color
+            profCluster.professionHubTextDirection = professionHub.textDirection
+            profCluster.professionHubLabelDistance = professionHub.labelDistance
+        else
+            profCluster.professionHubName = "Profession Tables"
+        end
+        
+        table.insert(condensedClusters, profCluster)
+    end
+    
+    return condensedClusters
 end
