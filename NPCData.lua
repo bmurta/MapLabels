@@ -43,6 +43,7 @@ local MINIMAP_ICONS = {
 
     ROSTRUM = "Interface\\AddOns\\CityGuide\\Icons\\rostrum",
     ORDERS = "Interface\\AddOns\\CityGuide\\Icons\\craftingorders",
+    CATALYST = "Interface\\AddOns\\CityGuide\\Icons\\catalyst"
 }
 
 -- IMPORTANT: Only define CityGuideNPCData ONCE!
@@ -164,7 +165,7 @@ CityGuideNPCData = {
         {
             x = 55.45 / 100, 
             y = 77.18 / 100, 
-            name = "PvP", 
+            name = "PvP\nDummies", 
             icon = "Interface\\Icons\\achievement_legionpvp2tier3", 
             minimapIcon = MINIMAP_ICONS.PVP,
             color = "FF2020"
@@ -581,6 +582,26 @@ CityGuideNPCData = {
         color = "FFD700"
     },
     {
+        x = 48.61 / 100, 
+        y = 61.98 / 100, 
+        name = "Upgrades", 
+        icon = "Interface\\Icons\\ui_itemupgrade", 
+        minimapIcon = MINIMAP_ICONS.UPGRADE,
+        noCluster = true, 
+        textDirection = "right", 
+        labelDistance = "1.5"
+    },
+    {
+        x = 51.50 / 100, 
+        y = 74.68 / 100, 
+        name = "AH", 
+        icon = "Interface\\Icons\\INV_Misc_Coin_01", 
+        minimapIcon = MINIMAP_ICONS.AUCTIONEER,
+        noCluster = true,
+        textDirection = "left",
+        labelDistance = "0.8",
+    },
+    {
         x = 72.56 / 100, 
         y = 64.55 / 100, 
         name = "Bank", 
@@ -598,11 +619,27 @@ CityGuideNPCData = {
         noCluster = true
     },
     {
+        x = 40.19 / 100, 
+        y = 65.19 / 100, 
+        name = "Catalyst", 
+        icon = MINIMAP_ICONS.CATALYST,
+        minimapIcon = MINIMAP_ICONS.CATALYST,
+        noCluster = true, 
+    },
+    {
         x = 56.28 / 100, 
         y = 70.33 / 100, 
         name = "Inn\nCook", 
         icon = "Interface\\Icons\\inv_misc_rune_01", 
         minimapIcon = MINIMAP_ICONS.INNKEEPER,
+        noCluster = true
+    },
+    {
+        x = 43.18 / 100, 
+        y = 78.23 / 100, 
+        name = "Barber", 
+        icon = MINIMAP_ICONS.BARBER, 
+        minimapIcon = MINIMAP_ICONS.BARBER,
         noCluster = true
     },
     {
