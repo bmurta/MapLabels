@@ -8,6 +8,8 @@ CityGuideConfig.enabledCities = CityGuideConfig.enabledCities or {}
 CityGuideConfig.cityIconSizes = CityGuideConfig.cityIconSizes or {}
 CityGuideConfig.cityLabelSizes = CityGuideConfig.cityLabelSizes or {}
 CityGuideConfig.condenseProfessions = CityGuideConfig.condenseProfessions or {}
+CityGuideConfig.showFactionPOIs = CityGuideConfig.showFactionPOIs or false
+CityGuideConfig.factionPOIsOnly = CityGuideConfig.factionPOIsOnly or {}
 
 -- Get city data from registry
 local cityOrder = CityGuide_GetCityOrder()
@@ -238,6 +240,37 @@ profFilterCheck:SetScript("OnClick", function(self)
     CityGuide_UpdateMapLabels()
 end)
 
+-- Faction Filter (Global)
+local factionFilterTitle = generalSection:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+factionFilterTitle:SetPoint("TOPLEFT", profFilterCheck, "BOTTOMLEFT", -20, -30)
+factionFilterTitle:SetText("Faction Filter")
+
+local factionFilterCheck = CreateFrame("CheckButton", nil, generalSection, "UICheckButtonTemplate")
+factionFilterCheck:SetPoint("TOPLEFT", factionFilterTitle, "BOTTOMLEFT", 0, -10)
+
+local factionFilterLabel = factionFilterCheck:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+factionFilterLabel:SetPoint("LEFT", factionFilterCheck, "RIGHT", 5, 0)
+factionFilterLabel:SetText("Show faction-specific POIs")
+
+-- We'll set the OnClick handler later after cityFactionOnlyCheckboxes is created
+
+factionFilterCheck:SetScript("OnEnter", function(self)
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+    GameTooltip:SetText("Show Faction-Specific POIs")
+    GameTooltip:AddLine("Displays faction-specific NPCs and locations in all cities", 1, 1, 1, true)
+    GameTooltip:AddLine(" ", 1, 1, 1)
+    local playerFaction = CityGuide_GetPlayerFaction()
+    GameTooltip:AddLine("Your faction: |cff00ff00" .. playerFaction .. "|r", 0.8, 0.8, 0.8)
+    GameTooltip:AddLine(" ", 1, 1, 1)
+    GameTooltip:AddLine("When enabled: Shows NPCs tagged for your faction", 0.6, 0.6, 0.6, true)
+    GameTooltip:AddLine("When disabled: Hides all faction-tagged NPCs", 0.6, 0.6, 0.6, true)
+    GameTooltip:Show()
+end)
+
+factionFilterCheck:SetScript("OnLeave", function()
+    GameTooltip:Hide()
+end)
+
 -- ========================================
 -- DISPLAY SECTION
 -- ========================================
@@ -386,6 +419,7 @@ local cityIconSizeValues = {}
 local cityLabelSliders = {}
 local cityLabelSizeValues = {}
 local cityProfessionCheckboxes = {}
+local cityFactionOnlyCheckboxes = {}
 
 local perCityYOffset = -80
 
@@ -477,9 +511,90 @@ for _, mapID in ipairs(cityOrder) do
         perCityYOffset = perCityYOffset - 50
     end
     
+    -- Show Faction POIs Only Checkbox (only for Silvermoon - mapID 2393)
+    if mapID == 2393 then
+        local factionOnlyCheckbox = CreateFrame("CheckButton", nil, perCitySection, "UICheckButtonTemplate")
+        factionOnlyCheckbox:SetPoint("TOPLEFT", 20, perCityYOffset)
+        
+        local factionOnlyLabel = factionOnlyCheckbox:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+        factionOnlyLabel:SetPoint("LEFT", factionOnlyCheckbox, "RIGHT", 5, 0)
+        factionOnlyLabel:SetText("Faction POIs Only (Horde)")
+        
+        factionOnlyCheckbox.mapID = mapID
+        factionOnlyCheckbox:SetScript("OnClick", function(self)
+            CityGuideConfig.factionPOIsOnly = CityGuideConfig.factionPOIsOnly or {}
+            CityGuideConfig.factionPOIsOnly[self.mapID] = self:GetChecked()
+            CityGuide_UpdateMapLabels()
+        end)
+        
+        factionOnlyCheckbox:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetText("Faction POIs Only Mode")
+            
+            if not CityGuideConfig.showFactionPOIs then
+                GameTooltip:AddLine("|cffff0000Requires 'Show faction-specific POIs' to be enabled|r", 1, 1, 1, true)
+                GameTooltip:AddLine("(Found in General Settings tab)", 0.8, 0.8, 0.8)
+            else
+                GameTooltip:AddLine("Shows your faction's POIs, intelligently hiding duplicates", 1, 1, 1, true)
+                GameTooltip:AddLine(" ", 1, 1, 1)
+                local playerFaction = CityGuide_GetPlayerFaction()
+                GameTooltip:AddLine("Your faction: |cff00ff00" .. playerFaction .. "|r", 0.8, 0.8, 0.8)
+                GameTooltip:AddLine(" ", 1, 1, 1)
+                GameTooltip:AddLine("How it works:", 0.5, 1, 0.5)
+                GameTooltip:AddLine("• Shows faction-specific POIs for your faction", 1, 1, 1, true)
+                GameTooltip:AddLine("• Hides neutral POIs only when a faction version exists", 1, 1, 1, true)
+                GameTooltip:AddLine("• Keeps neutral POIs with no faction alternative (e.g., Barber)", 1, 1, 1, true)
+                GameTooltip:AddLine(" ", 1, 1, 1)
+                GameTooltip:AddLine("Perfect for removing duplicate Banks/Inns while keeping unique services!", 0.8, 0.8, 0.8, true)
+            end
+            
+            GameTooltip:Show()
+        end)
+        
+        factionOnlyCheckbox:SetScript("OnLeave", function()
+            GameTooltip:Hide()
+        end)
+        
+        cityFactionOnlyCheckboxes[mapID] = factionOnlyCheckbox
+        perCityYOffset = perCityYOffset - 50
+    end
+    
     -- Separator line
     perCityYOffset = perCityYOffset - 20
 end
+
+-- Now set up the faction filter checkbox OnClick handler after cityFactionOnlyCheckboxes is populated
+factionFilterCheck:SetScript("OnClick", function(self)
+    CityGuideConfig.showFactionPOIs = self:GetChecked()
+    
+    -- If disabling faction POIs, also disable Faction POIs Only mode
+    if not self:GetChecked() then
+        CityGuideConfig.factionPOIsOnly = CityGuideConfig.factionPOIsOnly or {}
+        for mapID, _ in pairs(CityGuideConfig.factionPOIsOnly) do
+            CityGuideConfig.factionPOIsOnly[mapID] = false
+        end
+        -- Update UI checkboxes if they exist
+        if cityFactionOnlyCheckboxes then
+            for mapID, checkbox in pairs(cityFactionOnlyCheckboxes) do
+                if checkbox then
+                    checkbox:SetChecked(false)
+                    checkbox:Disable()
+                end
+            end
+        end
+    else
+        -- Re-enable Faction POIs Only checkboxes when turning on faction POIs
+        if cityFactionOnlyCheckboxes then
+            for mapID, checkbox in pairs(cityFactionOnlyCheckboxes) do
+                if checkbox then
+                    checkbox:Enable()
+                end
+            end
+        end
+    end
+    
+    CityGuide_UpdateMapLabels()
+end)
 
 -- Update reset button to include per-city sizes and profession condensation
 resetButton:SetScript("OnClick", function()
@@ -526,6 +641,7 @@ panel:SetScript("OnShow", function()
     end
     
     profFilterCheck:SetChecked(CityGuideConfig.filterByProfession)
+    factionFilterCheck:SetChecked(CityGuideConfig.showFactionPOIs)
     labelSizeSlider:SetValue(CityGuideConfig.labelSize or 1.0)
     iconSizeSlider:SetValue(CityGuideConfig.iconSize or 1.0)
     labelSizeValue:SetText(string.format("%.1fx", CityGuideConfig.labelSize or 1.0))
@@ -552,6 +668,25 @@ panel:SetScript("OnShow", function()
                 CityGuideConfig.condenseProfessions[mapID] = defaultCondensation[mapID] or false
             end
             checkbox:SetChecked(CityGuideConfig.condenseProfessions[mapID])
+        end
+    end
+    
+    -- Update faction checkboxes
+    CityGuideConfig.factionPOIsOnly = CityGuideConfig.factionPOIsOnly or {}
+    for mapID, checkbox in pairs(cityFactionOnlyCheckboxes) do
+        if checkbox then
+            -- Set checkbox state
+            checkbox:SetChecked(CityGuideConfig.factionPOIsOnly[mapID] or false)
+            
+            -- Enable/disable based on global faction POI setting
+            if CityGuideConfig.showFactionPOIs then
+                checkbox:Enable()
+            else
+                checkbox:Disable()
+                -- Also uncheck if global setting is off
+                checkbox:SetChecked(false)
+                CityGuideConfig.factionPOIsOnly[mapID] = false
+            end
         end
     end
     

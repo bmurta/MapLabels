@@ -14,6 +14,8 @@ CityGuideConfig.enabledCities = CityGuideConfig.enabledCities or {}
 CityGuideConfig.cityIconSizes = CityGuideConfig.cityIconSizes or {}
 CityGuideConfig.cityLabelSizes = CityGuideConfig.cityLabelSizes or {}
 CityGuideConfig.condenseProfessions = CityGuideConfig.condenseProfessions or {}
+CityGuideConfig.showFactionPOIs = CityGuideConfig.showFactionPOIs or false
+CityGuideConfig.factionPOIsOnly = CityGuideConfig.factionPOIsOnly or {}
 
 -- Function to clear old labels
 local function ClearLabels()
@@ -21,6 +23,17 @@ local function ClearLabels()
         label:Hide()
     end
     activeLabels = {}
+end
+
+-- Function to filter NPCs by faction
+local function FilterNPCsByFaction(npcList, mapID)
+    local filtered = {}
+    for _, npc in ipairs(npcList) do
+        if CityGuide_ShouldShowNPCByFaction(npc, mapID, npcList) then
+            table.insert(filtered, npc)
+        end
+    end
+    return filtered
 end
 
 -- Function to add labels to the map
@@ -46,7 +59,7 @@ function CityGuide_UpdateMapLabels()
 
     -- Only show button if we have data for this map
     if mapID and CityGuideNPCData[mapID] then
-        CityGuide_CreateOrUpdateMapButton() -- Only call this one now
+        CityGuide_CreateOrUpdateMapButton()
     else
         CityGuide_HideMapButton()
         return
@@ -65,11 +78,14 @@ function CityGuide_UpdateMapLabels()
     local finalIconSize = CityGuideConfig.iconSize * cityIconMultiplier
     local finalLabelSize = CityGuideConfig.labelSize * cityLabelMultiplier
     
-    -- Get the full NPC list (before profession filtering)
+    -- Get the full NPC list
     local fullNPCList = CityGuideNPCData[mapID]
     
-    -- Apply profession filter for what we'll display
-    local filteredNPCList = CityGuide_FilterNPCsByProfession(fullNPCList)
+    -- Apply faction filter first
+    local factionFilteredList = FilterNPCsByFaction(fullNPCList, mapID)
+    
+    -- Then apply profession filter
+    local filteredNPCList = CityGuide_FilterNPCsByProfession(factionFilteredList)
 
     if CityGuideConfig.displayMode == "icons" then
         -- Icons only - NO CLUSTERING, use original positions, regular square icons

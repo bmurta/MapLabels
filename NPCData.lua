@@ -70,6 +70,13 @@ CityGuideNPCData = {
             icon = "Interface\\Icons\\Spell_Arcane_PortalDalaran",
             minimapIcon = MINIMAP_ICONS.PORTAL_ALLY
         },
+        {x = 61.42 / 100,
+         y = 66.14 / 100,
+            name = "Barber", 
+            icon = MINIMAP_ICONS.BARBER, 
+            minimapIcon = MINIMAP_ICONS.BARBER,
+            noCluster = true,
+        }, 
     },
     [85] = { -- Orgrimmar
         {
@@ -602,15 +609,6 @@ CityGuideNPCData = {
         labelDistance = "0.8",
     },
     {
-        x = 72.56 / 100, 
-        y = 64.55 / 100, 
-        name = "Bank", 
-        icon = "Interface\\Icons\\INV_Misc_Bag_07", 
-        minimapIcon = MINIMAP_ICONS.BANKER,
-        noCluster = true, 
-        color = "FFD700"
-    },
-    {
         x = 53.37 / 100, 
         y = 66.31 / 100, 
         name = "Portals", 
@@ -680,7 +678,126 @@ CityGuideNPCData = {
         name = "PvP", 
         icon = "Interface\\Icons\\achievement_legionpvp2tier3", 
         minimapIcon = MINIMAP_ICONS.PVP,
-        color = "FF2020"
+        color = "FF2020",
+        labelDistance = 1.8
+    },
+    {
+        x = 36.78 / 100, 
+        y = 85.65 / 100, 
+        name = "Dummy", 
+        icon = "Interface\\Icons\\Ability_rogue_combatexpertise", 
+        minimapIcon = MINIMAP_ICONS.PVP_OLD,
+        color = "FF2020",
+    },
+
+    -- Horde Only
+        {
+        x = 72.56 / 100, 
+        y = 64.55 / 100, 
+        name = "Bank", 
+        icon = "Interface\\Icons\\INV_Misc_Bag_07", 
+        minimapIcon = MINIMAP_ICONS.BANKER,
+        noCluster = true, 
+        color = "FFD700",
+        faction = "Horde"
+    },
+    {
+        x = 66.94 / 100, 
+        y = 62.14 / 100, 
+        name = "Inn", 
+        icon = "Interface\\Icons\\inv_misc_rune_01", 
+        minimapIcon = MINIMAP_ICONS.INNKEEPER,
+        noCluster = true, 
+        faction = "Horde"
+    },
+    {
+        x = 67.61 / 100, 
+        y = 72.50 / 100, 
+        name = "AH", 
+        icon = "Interface\\Icons\\INV_Misc_Coin_01", 
+        minimapIcon = MINIMAP_ICONS.AUCTIONEER,
+        noCluster = true, 
+        faction = "Horde"
+    },
+    {
+        x = 70.12 / 100, 
+        y = 83.29 / 100, 
+        name = "Catalyst", 
+        icon = MINIMAP_ICONS.CATALYST,
+        minimapIcon = MINIMAP_ICONS.CATALYST,
+        faction = "Horde"
+    },
+    {
+        x = 73.89 / 100, 
+        y = 74.34 / 100, 
+        name = "Alch", 
+        icon = "Interface\\Icons\\Trade_Alchemy", 
+        minimapIcon = MINIMAP_ICONS.PROF_TRAINER,
+        color = "00FF00", 
+        faction = "Horde"
+    },
+        {
+        x = 69.69 / 100, 
+        y = 84.51 / 100, 
+        name = "BS", 
+        icon = "Interface\\Icons\\Trade_BlackSmithing", 
+        minimapIcon = MINIMAP_ICONS.PROF_TRAINER,
+        color = "00FF00", 
+        faction = "Horde"
+    },
+    {
+        x = 72.89/ 100, 
+        y = 71.54 / 100, 
+        name = "Ench", 
+        icon = "Interface\\Icons\\Trade_Engraving", 
+        minimapIcon = MINIMAP_ICONS.PROF_TRAINER,
+        color = "00FF00",
+        faction = "Horde"
+    },
+    {
+        x = 69.40 / 100, 
+        y = 84.35 / 100, 
+        name = "Engi", 
+        icon = "Interface\\Icons\\Trade_Engineering", 
+        minimapIcon = MINIMAP_ICONS.PROF_TRAINER,
+        color = "00FF00", 
+        faction = "Horde"
+    },
+    {
+        x = 72.58 / 100, 
+        y = 71.16 / 100, 
+        name = "Insc", 
+        icon = "Interface\\Icons\\INV_Inscription_Tradeskill01", 
+        minimapIcon = MINIMAP_ICONS.PROF_TRAINER,
+        color = "00FF00", 
+        faction = "Horde"
+    },
+    {
+        x = 73.70 / 100, 
+        y = 70.57 / 100, 
+        name = "Jewel", 
+        icon = "Interface\\Icons\\INV_Misc_Gem_01", 
+        minimapIcon = MINIMAP_ICONS.PROF_TRAINER,
+        color = "00FF00",
+        faction = "Horde"
+    },
+    {
+        x = 69.81 / 100, 
+        y = 81.17 / 100, 
+        name = "LW", 
+        icon = "Interface\\Icons\\INV_Misc_ArmorKit_17", 
+        minimapIcon = MINIMAP_ICONS.PROF_TRAINER,
+        color = "00FF00", 
+        faction = "Horde"
+    },
+    {
+        x = 73.38 / 100, 
+        y = 72.71 / 100, 
+        name = "Tailor", 
+        icon = "Interface\\Icons\\Trade_Tailoring", 
+        minimapIcon = MINIMAP_ICONS.PROF_TRAINER,
+        color = "00FF00",
+        faction = "Horde"
     },
 
     -- Profession Tables
@@ -691,7 +808,7 @@ CityGuideNPCData = {
         icon = "Interface\\Icons\\Trade_Alchemy", 
         minimapIcon = MINIMAP_ICONS.PROF_TRAINER,
         color = "00FF00", 
-        noCluster = true
+        textDirection = "top"
     },
     {
         x = 43.74 / 100, 
@@ -700,16 +817,8 @@ CityGuideNPCData = {
         icon = "Interface\\Icons\\Trade_BlackSmithing", 
         minimapIcon = MINIMAP_ICONS.PROF_TRAINER,
         color = "00FF00", 
-        noCluster = true
-    },
-    {
-        x = 46.78 / 100, 
-        y = 51.48 / 100, 
-        name = "Insc", 
-        icon = "Interface\\Icons\\INV_Inscription_Tradeskill01", 
-        minimapIcon = MINIMAP_ICONS.PROF_TRAINER,
-        color = "00FF00", 
-        noCluster = true
+        noCluster = true,
+        textDirection = "top"
     },
     {
         x = 47.97 / 100, 
@@ -727,6 +836,15 @@ CityGuideNPCData = {
         minimapIcon = MINIMAP_ICONS.PROF_TRAINER,
         color = "00FF00", 
         noCluster = true
+    },
+    {
+        x = 46.78 / 100, 
+        y = 51.48 / 100, 
+        name = "Insc", 
+        icon = "Interface\\Icons\\INV_Inscription_Tradeskill01", 
+        minimapIcon = MINIMAP_ICONS.PROF_TRAINER,
+        color = "00FF00", 
+        textDirection = "top"
     },
     {
         x = 47.93 / 100, 
@@ -764,6 +882,13 @@ CityGuideProfessionHubs = {
         color = "00FF00",  -- optional, defaults to green
         textDirection = "none",  -- optional: "none", "left", "right", "top", "down"
         labelDistance = 1.0  -- optional, defaults to 1.0
+    },
+    {x = 73.88 / 100, y = 72.89 / 100,
+        name = "Profession Tables",  -- optional, defaults to "Profession Tables"
+        color = "00FF00",  -- optional, defaults to green
+        textDirection = "none",  -- optional: "none", "left", "right", "top", "down"
+        labelDistance = 1.0,  -- optional, defaults to 1.0
+        faction = "Horde"
     },
     [2339] = { -- Dornogal
         x = 52.29 / 100,  -- Where you want the label to appear
