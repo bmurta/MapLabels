@@ -22,6 +22,7 @@ local MINIMAP_ICONS = {
     PVP_OLD = "Interface\\Minimap\\Tracking\\battlemaster",
     GOLD_HAMMER = "Interface\\Minimap\\trapinactive_hammergold",
     WORK_ORDERS = "Interface\\Cursor\\Crosshair\\workorders",
+   
     
     -- Trainers
     CLASS_TRAINER = "Interface\\Minimap\\Tracking\\Class",
@@ -43,7 +44,9 @@ local MINIMAP_ICONS = {
 
     ROSTRUM = "Interface\\AddOns\\CityGuide\\Icons\\rostrum",
     ORDERS = "Interface\\AddOns\\CityGuide\\Icons\\craftingorders",
-    CATALYST = "Interface\\AddOns\\CityGuide\\Icons\\catalyst"
+    CATALYST = "Interface\\AddOns\\CityGuide\\Icons\\catalyst",
+    DECOR = "Interface\\AddOns\\CityGuide\\Icons\\decor",
+    RENOWN = "Interface\\AddOns\\CityGuide\\Icons\\renown",
 }
 
 -- IMPORTANT: Only define CityGuideNPCData ONCE!
@@ -52,7 +55,7 @@ CityGuideNPCData = {
         {
             x = 61.79 / 100, 
             y = 73.00 / 100, 
-            name = "Auction House", 
+            name = "AH", 
             icon = "Interface\\Icons\\INV_Misc_Coin_01",
             minimapIcon = MINIMAP_ICONS.AUCTIONEER
         },
@@ -76,13 +79,50 @@ CityGuideNPCData = {
             icon = MINIMAP_ICONS.BARBER, 
             minimapIcon = MINIMAP_ICONS.BARBER,
             noCluster = true,
-        }, 
+        },
+        {
+            x = 80.08 / 100, 
+            y = 62.51 / 100, 
+            name = "Dummies", 
+            icon = "Interface\\Icons\\achievement_legionpvp2tier3", 
+            minimapIcon = MINIMAP_ICONS.PVP,
+            color = "FF2020",
+            textDirection = "top"
+        },
+            {
+            x = 49.32/ 100, 
+            y = 80.08 / 100, 
+            name = "Decor\n(Books)", 
+            icon = "Interface\\Housing\\inv_12ph_genericfixture",
+            minimapIcon = MINIMAP_ICONS.DECOR,
+            textDirection = "top",
+            noCluster = true, 
+            labelDistance = 1.5
+        },
+        {
+            x = 77.87/ 100, 
+            y = 65.89 / 100, 
+            name = "Decor\n(PvP)", 
+            icon = "Interface\\Housing\\inv_12ph_genericfixture",
+            minimapIcon = MINIMAP_ICONS.DECOR,
+            noCluster = true, 
+        },
+        {
+            x = 67.62/ 100, 
+            y = 72.98 / 100, 
+            name = "Decor", 
+            icon = "Interface\\Housing\\inv_12ph_genericfixture",
+            minimapIcon = MINIMAP_ICONS.DECOR,
+            noCluster = true,
+            textDirection = "right",
+            labelDistance = 1.3
+        },
     },
     [85] = { -- Orgrimmar
         {
             x = 0.54, 
             y = 0.73, 
-            name = "Auction House", 
+            name = "AH", 
             icon = "Interface\\Icons\\INV_Misc_Coin_01",
             minimapIcon = MINIMAP_ICONS.AUCTIONEER
         },
@@ -92,6 +132,44 @@ CityGuideNPCData = {
             name = "Bank", 
             icon = "Interface\\Icons\\INV_Misc_Bag_07",
             minimapIcon = MINIMAP_ICONS.BANKER
+        },
+        {
+        x = 48.66 / 100, 
+        y = 76.04 / 100, 
+        name = "TP", 
+        icon = "Interface\\Icons\\Tradingpostcurrency", 
+        minimapIcon = "Interface\\Icons\\Tradingpostcurrency",
+        textDirection = "top",
+        noCluster = true, 
+        color = "99CCFF"
+    },
+        {
+            x = 52.78/ 100, 
+            y = 89.06 / 100, 
+            name = "Decor", 
+            icon = "Interface\\Housing\\inv_12ph_genericfixture",
+            minimapIcon = MINIMAP_ICONS.DECOR
+        },
+        {
+            x = 50.35/ 100, 
+            y = 58.28 / 100, 
+            name = "Decor\n(Org Quartermaster)", 
+            icon = "Interface\\Housing\\inv_12ph_genericfixture",
+            minimapIcon = MINIMAP_ICONS.DECOR
+        },
+        {
+            x = 58.58/ 100, 
+            y = 50.43 / 100, 
+            name = "Decor\n(Books)", 
+            icon = "Interface\\Housing\\inv_12ph_genericfixture",
+            minimapIcon = MINIMAP_ICONS.DECOR
+        },
+        {
+            x = 38.85/ 100, 
+            y = 72.01 / 100, 
+            name = "Decor\n(PvP)", 
+            icon = "Interface\\Housing\\inv_12ph_genericfixture",
+            minimapIcon = MINIMAP_ICONS.DECOR
         },
     },
     [2339] = { -- Dornogal
@@ -172,10 +250,19 @@ CityGuideNPCData = {
         {
             x = 55.45 / 100, 
             y = 77.18 / 100, 
-            name = "PvP\nDummies", 
+            name = "PvP\nDecor\nDummies", 
             icon = "Interface\\Icons\\achievement_legionpvp2tier3", 
             minimapIcon = MINIMAP_ICONS.PVP,
             color = "FF2020"
+        },
+        {
+            x = 53.78 / 100, 
+            y = 57.19 / 100, 
+            name = "Decor", 
+            icon = "Interface\\Housing\\inv_12ph_genericfixture",
+            minimapIcon = MINIMAP_ICONS.DECOR,
+            textDirection = "top", 
+            noCluster = true,
         },
        
         -- Portals
@@ -337,8 +424,38 @@ CityGuideNPCData = {
             icon = "Interface\\Icons\\INV_Misc_Coin_01",
             minimapIcon = MINIMAP_ICONS.QUESTGIVER
         },
-         -- Profession 
-        
+        {
+            x = 43.38/ 100, 
+            y = 49.42 / 100, 
+            name = "Decor", 
+            icon = "Interface\\Housing\\inv_12ph_genericfixture",
+            minimapIcon = MINIMAP_ICONS.DECOR
+        },
+        {
+            x = 67.41 / 100, 
+            y = 33.64 / 100, 
+            name = "Horde Decor", 
+            icon = "Interface\\Housing\\inv_12ph_genericfixture",
+            minimapIcon = MINIMAP_ICONS.DECOR,
+            faction = "Horde"
+        },
+        {
+            x = 59.60 / 100, 
+            y = 47.64 / 100, 
+            name = "Remix Decor\n(Sewers)", 
+            icon = "Interface\\Housing\\inv_12ph_genericfixture",
+            minimapIcon = MINIMAP_ICONS.DECOR,
+            labelDistance = 1.5
+        },
+    },
+    [628] = { --Legion sewers
+        {
+        x = 67.52/ 100, 
+        y = 63.06 / 100, 
+        name = "Remix Decor", 
+        icon = "Interface\\Housing\\inv_12ph_genericfixture",
+        minimapIcon = MINIMAP_ICONS.DECOR,
+        },
     },
     [2112] = { -- Valdrakken (Dragonflight)
         -- Main Services
@@ -520,9 +637,16 @@ CityGuideNPCData = {
         {
             x = 40.65 / 100, 
             y = 29.11 / 100, 
-            name = "Renown", 
+            name = "Renown\nDecor", 
             icon = "Interface\\Icons\\ability_racial_etherealconnection",
-            minimapIcon = MINIMAP_ICONS.QUESTGIVER
+            minimapIcon = MINIMAP_ICONS.RENOWN
+        },
+        {
+            x = 43.30/ 100, 
+            y = 35.53 / 100, 
+            name = "Decor", 
+            icon = "Interface\\Housing\\inv_12ph_genericfixture",
+            minimapIcon = MINIMAP_ICONS.DECOR
         },
         {
             x = 41.07 / 100, 
