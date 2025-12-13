@@ -543,8 +543,6 @@ CityGuideNPCData = {
             minimapIcon = MINIMAP_ICONS.PORTAL_HORDE,
             textDirection = "top"
         },
-        
-        -- Dragonriding
         {
             x = 25.03 / 100, 
             y = 50.59 / 100, 
@@ -554,6 +552,14 @@ CityGuideNPCData = {
             noCluster = true, 
             textDirection = "left", 
             labelDistance = 1.3
+        },
+        {
+            x = 71.66/ 100, 
+            y = 49.41 / 100, 
+            name = "Decor", 
+            icon = "Interface\\Housing\\inv_12ph_genericfixture",
+            minimapIcon = MINIMAP_ICONS.DECOR,
+            noCluster = true,
         },
         
         -- Profession Trainers & Stations
@@ -841,6 +847,7 @@ CityGuideNPCData = {
         icon = "Interface\\Icons\\INV_Misc_Coin_01", 
         minimapIcon = MINIMAP_ICONS.AUCTIONEER,
         noCluster = true, 
+        textDirection = "top",  
         faction = "Horde"
     },
     {
@@ -985,6 +992,7 @@ CityGuideNPCData = {
         icon = "Interface\\Icons\\INV_Misc_ArmorKit_17", 
         minimapIcon = MINIMAP_ICONS.PROF_TRAINER,
         color = "00FF00", 
+        textDirection = "top",
         noCluster = true
     },
     {
@@ -999,32 +1007,34 @@ CityGuideNPCData = {
 }
 
 -- Profession Hub Markers (optional - define custom position for "Profession Tables" label)
--- Only ONE hub per map. If not defined, the system will automatically calculate center of all professions.
 CityGuideProfessionHubs = {
-    [2393] = {x = 45.67 / 100, y = 48.91 / 100,
-        name = "Profession Tables",  -- optional, defaults to "Profession Tables"
-        color = "00FF00",  -- optional, defaults to green
-        textDirection = "none",  -- optional: "none", "left", "right", "top", "down"
-        labelDistance = 1.0  -- optional, defaults to 1.0
-    },
-    {x = 73.88 / 100, y = 72.89 / 100,
-        name = "Profession Tables",  -- optional, defaults to "Profession Tables"
-        color = "00FF00",  -- optional, defaults to green
-        textDirection = "none",  -- optional: "none", "left", "right", "top", "down"
-        labelDistance = 1.0,  -- optional, defaults to 1.0
-        faction = "Horde"
-    },
-    [2339] = { -- Dornogal
-        x = 52.29 / 100,  -- Where you want the label to appear
+    [2393] = {  --  Silvermoon 
+        {  -- First hub (neutral)
+            x = 45.67 / 100, 
+            y = 48.91 / 100,
+            name = "Profession\nTables",
+            color = "00FF00",
+        },
+        {  -- Second hub (Horde)
+            x = 73.21 / 100, 
+            y = 73.58 / 100,
+            name = "Profession\nTables",
+            color = "00FF00",
+            faction = "Horde"
+        },
+    },  
+    
+    [2339] = {
+        x = 52.29 / 100,
         y = 71.34 / 100,
-        name = "Profession Tables",  
+        name = "Profession\nTables",  
         color = "00FF00",  
-        textDirection = "none",  
-        labelDistance = 1.0  
     },
-    [2112] = { -- Valdrakken
+    
+    [2112] = {
         x = 35.00 / 100,
         y = 60.00 / 100,
-        name = "Profession Tables"
+        name = "Profession Tables",
+        color = "00FF00",  
     },
 }

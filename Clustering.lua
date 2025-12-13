@@ -30,6 +30,11 @@ local function AreAllProfessions(cluster)
     return true
 end
 
+-- Function to check if an NPC is a profession
+function CityGuide_IsProfessionNPC(npcName)
+    return professions[npcName] == true
+end
+
 -- Function to generate cluster label text
 function CityGuide_GetClusterLabel(cluster)
     -- Check if this is a condensed profession hub
@@ -106,42 +111,71 @@ function CityGuide_ClusterNPCs(npcList, clusterRadius)
     return clusters
 end
 
--- Function to condense profession clusters into single "Profession Tables" label
-function CityGuide_CondenseProfessionClusters(clusters, professionHub)
-    local condensedClusters = {}
-    local allProfessionNPCs = {}
+-- NEW SIMPLIFIED APPROACH: Filter out profession NPCs and add hub labels instead
+function CityGuide_FilterAndAddProfessionHubs(npcList, professionHubs)
+    if not professionHubs then
+        return npcList  -- No hubs defined, return as-is
+    end
     
-    -- Collect all profession NPCs from all clusters
-    for _, cluster in ipairs(clusters) do
-        if AreAllProfessions(cluster) then
-            for _, npc in ipairs(cluster) do
-                table.insert(allProfessionNPCs, npc)
-            end
-        else
-            -- Non-profession cluster, keep as-is
-            table.insert(condensedClusters, cluster)
+    -- Check if professionHubs is a single hub (old format) or multiple hubs (new format)
+    -- Old format: {x = ..., y = ...} (has x field directly)
+    -- New format: {{x = ..., y = ...}, {...}} (first element is a table with x)
+    local isMultipleHubs = type(professionHubs[1]) == "table" and professionHubs[1].x ~= nil
+    local hubsList = isMultipleHubs and professionHubs or {professionHubs}
+    
+    local filtered = {}
+    local professionsByFaction = {
+        neutral = false,    -- neutral professions exist?
+        Horde = false,
+        Alliance = false
+    }
+    
+    -- Pass 1: Check which faction groups have professions
+    for _, npc in ipairs(npcList) do
+        if CityGuide_IsProfessionNPC(npc.name) then
+            local factionKey = npc.faction or "neutral"
+            professionsByFaction[factionKey] = true
         end
     end
     
-    -- If we have profession NPCs, create a single condensed cluster
-    if #allProfessionNPCs > 0 then
-        local profCluster = allProfessionNPCs
-        profCluster.isProfessionHub = true
-        
-        -- Use manual hub settings if provided
-        if professionHub then
-            profCluster.professionHubName = professionHub.name or "Profession Tables"
-            profCluster.professionHubX = professionHub.x
-            profCluster.professionHubY = professionHub.y
-            profCluster.professionHubColor = professionHub.color
-            profCluster.professionHubTextDirection = professionHub.textDirection
-            profCluster.professionHubLabelDistance = professionHub.labelDistance
-        else
-            profCluster.professionHubName = "Profession Tables"
+    -- Pass 2: Filter out professions, keep everything else
+    for _, npc in ipairs(npcList) do
+        if not CityGuide_IsProfessionNPC(npc.name) then
+            -- Not a profession, keep it
+            table.insert(filtered, npc)
         end
-        
-        table.insert(condensedClusters, profCluster)
+        -- Professions are filtered out (not added to filtered list)
     end
     
-    return condensedClusters
+    -- Pass 3: Add hub labels for faction groups that have professions
+    for _, hub in ipairs(hubsList) do
+        local hubFaction = hub.faction or "neutral"  -- nil for neutral, "Horde", or "Alliance"
+        
+        if professionsByFaction[hubFaction] then
+            -- This faction group has professions, add the hub label
+            local hubNPC = {
+                x = hub.x,
+                y = hub.y,
+                name = hub.name or "Profession Tables",
+                icon = "Interface\\Icons\\Trade_Alchemy",  -- Dummy icon
+                minimapIcon = "Interface\\Minimap\\Tracking\\Profession",
+                color = hub.color or "00FF00",
+                textDirection = hub.textDirection or "none",
+                labelDistance = hub.labelDistance or 1.0,
+                noCluster = true,  -- Don't cluster hub labels
+                isProfessionHub = true  -- Mark as hub for special handling
+            }
+            
+            table.insert(filtered, hubNPC)
+        end
+    end
+    
+    return filtered
+end
+
+-- Old condensation function - kept for backward compatibility but no longer used
+function CityGuide_CondenseProfessionClusters(clusters, professionHubs)
+    -- This function is no longer used with the new approach
+    -- Keeping it here to avoid breaking anything that might reference it
+    return clusters
 end
