@@ -82,3 +82,32 @@ function CityGuide_ShouldShowNPCByFaction(npc, mapID, fullNPCList)
     local playerFaction = CityGuide_GetPlayerFaction()
     return npc.faction == playerFaction
 end
+
+-- Function to check if NPC name starts with "Decor"
+local function StartsWithDecor(npcName)
+    return npcName:match("^Decor") ~= nil
+end
+
+-- Function to check if NPC should be shown based on decor filter
+function CityGuide_ShouldShowNPCByDecor(npc)
+    -- If decor POIs are disabled and this NPC starts with "Decor", hide it
+    if not CityGuideConfig.showDecorPOIs and StartsWithDecor(npc.name) then
+        return false
+    end
+    return true
+end
+
+-- Function to clean decor text from NPC names
+-- Removes "Decor\n" or "\nDecor" from names that contain but don't start with Decor
+function CityGuide_CleanDecorFromName(npcName)
+    -- If setting is disabled and name contains but doesn't start with "Decor", remove it
+    if not CityGuideConfig.showDecorPOIs then
+        -- Remove "Decor\n" (Decor followed by newline)
+        npcName = npcName:gsub("Decor\n", "")
+        -- Remove "\nDecor" (newline followed by Decor)
+        npcName = npcName:gsub("\nDecor", "")
+        -- Trim any extra whitespace
+        npcName = npcName:match("^%s*(.-)%s*$")
+    end
+    return npcName
+end

@@ -1,697 +1,90 @@
--- Initialize config early to prevent errors
-CityGuideConfig = CityGuideConfig or {}
-CityGuideConfig.displayMode = CityGuideConfig.displayMode or "labels"
-CityGuideConfig.filterByProfession = CityGuideConfig.filterByProfession or false
-CityGuideConfig.labelSize = CityGuideConfig.labelSize or 1.0
-CityGuideConfig.iconSize = CityGuideConfig.iconSize or 1.0
-CityGuideConfig.enabledCities = CityGuideConfig.enabledCities or {}
-CityGuideConfig.cityIconSizes = CityGuideConfig.cityIconSizes or {}
-CityGuideConfig.cityLabelSizes = CityGuideConfig.cityLabelSizes or {}
-CityGuideConfig.condenseProfessions = CityGuideConfig.condenseProfessions or {}
-CityGuideConfig.showFactionPOIs = CityGuideConfig.showFactionPOIs or false
-CityGuideConfig.factionPOIsOnly = CityGuideConfig.factionPOIsOnly or {}
+-- Simple Settings Launcher Panel
+-- This just shows a button to open the standalone settings window
 
--- Get city data from registry
-local cityOrder = CityGuide_GetCityOrder()
-local mapNames = CityGuide_GetCityNames()
-local allowCondensation = CityGuide_GetCityAllowsProfessionCondensation()
-local defaultCondensation = CityGuide_GetCityDefaultCondensation()
+-- Store city themes globally for standalone window
+CityGuideSettings = CityGuideSettings or {}
+CityGuideSettings.cityThemes = {
+    [2393] = {r1=0.8, g1=0.1, b1=0.1, r2=0.4, g2=0.05, b2=0.05, name="Silvermoon", icon="Interface\\Icons\\Inv_misc_tournaments_banner_bloodelf"},
+    [2339] = {r1=0.3, g1=0.2, b1=0.1, r2=0.15, g2=0.1, b2=0.05, name="Dornogal", icon="Interface\\Icons\\Ability_earthen_wideeyedwonder"},
+    [2472] = {r1=0.2, g1=0.3, b1=0.5, r2=0.1, g2=0.15, b2=0.3, name="Tazavesh", icon="Interface\\Icons\\inv_achievement_raidnerubian_etherealassasin"},
+    [2112] = {r1=0.1, g1=0.3, b1=0.5, r2=0.05, g2=0.15, b2=0.3, name="Valdrakken", icon="Interface\\AddOns\\CityGuide\\Icons\\rostrum"},
+    [627] = {r1=0.4, g1=0.2, b1=0.5, r2=0.2, g2=0.1, b2=0.3, name="Dalaran", icon="Interface\\Icons\\Spell_Arcane_PortalDalaran"},
+    [85] = {r1=0.6, g1=0.1, b1=0.1, r2=0.3, g2=0.05, b2=0.05, name="Orgrimmar", icon="Interface\\Icons\\INV_BannerPVP_01"},
+    [84] = {r1=0.1, g1=0.2, b1=0.5, r2=0.05, g2=0.1, b2=0.3, name="Stormwind", icon="Interface\\Icons\\INV_BannerPVP_02"},
+}
 
--- Create the main settings panel
+-- Create simple launcher panel
 local panel = CreateFrame("Frame", "CityGuideSettingsPanel", UIParent)
 panel.name = "City Guide"
 
 -- Title
-local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-title:SetPoint("TOPLEFT", 16, -16)
-title:SetText("City Guide Settings")
+local title = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
+title:SetPoint("TOP", 0, -40)
+title:SetText("City Guide")
+title:SetTextColor(1, 0.9, 0.5, 1)
 
 -- Description
 local desc = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-desc:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -8)
-desc:SetText("Configure how NPCs are displayed on the map")
+desc:SetPoint("TOP", title, "BOTTOM", 0, -20)
+desc:SetText("Displays important NPCs on capital city maps")
 
--- Create left navigation panel
-local navPanel = CreateFrame("Frame", nil, panel, "BackdropTemplate")
-navPanel:SetPoint("TOPLEFT", desc, "BOTTOMLEFT", 0, -20)
-navPanel:SetSize(150, 400)
-navPanel:SetBackdrop({
-    bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
-    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-    tile = true, tileSize = 16, edgeSize = 16,
-    insets = { left = 4, right = 4, top = 4, bottom = 4 }
-})
-navPanel:SetBackdropColor(0.1, 0.1, 0.1, 0.8)
-navPanel:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+-- Info text
+local infoText = panel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+infoText:SetPoint("TOP", desc, "BOTTOM", 0, -40)
+infoText:SetText("Click the button below to open the settings window,")
+infoText:SetTextColor(0.8, 0.8, 0.8)
 
--- Create right content panel with scroll
-local contentPanel = CreateFrame("Frame", nil, panel, "BackdropTemplate")
-contentPanel:SetPoint("TOPLEFT", navPanel, "TOPRIGHT", 10, 0)
-contentPanel:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -20, 20)
-contentPanel:SetBackdrop({
-    bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
-    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-    tile = true, tileSize = 16, edgeSize = 16,
-    insets = { left = 4, right = 4, top = 4, bottom = 4 }
-})
-contentPanel:SetBackdropColor(0.05, 0.05, 0.05, 0.8)
-contentPanel:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+local infoText2 = panel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+infoText2:SetPoint("TOP", infoText, "BOTTOM", 0, -5)
+infoText2:SetText("or use the command:")
+infoText2:SetTextColor(0.8, 0.8, 0.8)
 
--- Create scroll frame
-local scrollFrame = CreateFrame("ScrollFrame", nil, contentPanel, "UIPanelScrollFrameTemplate")
-scrollFrame:SetPoint("TOPLEFT", 8, -8)
-scrollFrame:SetPoint("BOTTOMRIGHT", -28, 8)
+-- Command text
+local commandText = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+commandText:SetPoint("TOP", infoText2, "BOTTOM", 0, -15)
+commandText:SetText("|cff00ff00/cg settings|r")
 
-local scrollChild = CreateFrame("Frame", nil, scrollFrame)
-scrollChild:SetSize(1, 1) -- Will be resized dynamically
-scrollFrame:SetScrollChild(scrollChild)
+-- Open Settings Button
+local openButton = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+openButton:SetSize(200, 40)
+openButton:SetPoint("TOP", commandText, "BOTTOM", 0, -30)
+openButton:SetText("Open Settings Window")
+openButton:SetNormalFontObject("GameFontNormalLarge")
 
--- Function to update scroll child width
-local function UpdateScrollChildSize()
-    local width = scrollFrame:GetWidth() - 10
-    scrollChild:SetWidth(width)
-end
-
-scrollFrame:SetScript("OnSizeChanged", UpdateScrollChildSize)
-UpdateScrollChildSize()
-
--- Helper functions
-local function CreateRadioButton(parent, text, xOffset, yOffset)
-    local button = CreateFrame("CheckButton", nil, parent, "UIRadioButtonTemplate")
-    button:SetPoint("TOPLEFT", parent, "TOPLEFT", xOffset, yOffset)
-    
-    local label = button:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    label:SetPoint("LEFT", button, "RIGHT", 5, 0)
-    label:SetText(text)
-    
-    button.label = label
-    return button
-end
-
-local function CreateSlider(parent, name, minVal, maxVal, step, xOffset, yOffset, width)
-    width = width or 200
-    local slider = CreateFrame("Slider", name, parent, "OptionsSliderTemplate")
-    slider:SetPoint("TOPLEFT", parent, "TOPLEFT", xOffset, yOffset)
-    slider:SetMinMaxValues(minVal, maxVal)
-    slider:SetValueStep(step)
-    slider:SetObeyStepOnDrag(true)
-    slider:SetWidth(width)
-    
-    _G[name.."Low"]:SetText(minVal)
-    _G[name.."High"]:SetText(maxVal)
-    
-    return slider
-end
-
--- Navigation buttons data
-local navCategories = {
-    {name = "General", id = "general"},
-    {name = "Display", id = "display"},
-    {name = "Size Settings", id = "sizes"},
-    {name = "Per-City Settings", id = "percity"}
-}
-
-local navButtons = {}
-local currentCategory = "general"
-
--- Content sections
-local contentSections = {}
-
--- Function to hide all content sections
-local function HideAllSections()
-    for id, section in pairs(contentSections) do
-        section:Hide()
-    end
-end
-
--- Function to show a specific section
-local function ShowSection(sectionId)
-    HideAllSections()
-    if contentSections[sectionId] then
-        contentSections[sectionId]:Show()
-        currentCategory = sectionId
-    end
-    
-    -- Update nav button highlights
-    for _, btn in ipairs(navButtons) do
-        if btn.categoryId == sectionId then
-            btn:SetBackdropColor(0.3, 0.3, 0.3, 1)
-        else
-            btn:SetBackdropColor(0.1, 0.1, 0.1, 0.5)
-        end
-    end
-end
-
--- Create navigation buttons
-local yOffset = -10
-for i, category in ipairs(navCategories) do
-    local btn = CreateFrame("Button", nil, navPanel, "BackdropTemplate")
-    btn:SetSize(130, 30)
-    btn:SetPoint("TOP", navPanel, "TOP", 0, yOffset)
-    btn:SetBackdrop({
-        bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
-        edgeFile = "Interface\\Buttons\\UI-Common-MouseHilight",
-        tile = true, tileSize = 16, edgeSize = 1,
-        insets = { left = 0, right = 0, top = 0, bottom = 0 }
-    })
-    btn:SetBackdropColor(0.1, 0.1, 0.1, 0.5)
-    btn:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
-    
-    local text = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    text:SetPoint("CENTER")
-    text:SetText(category.name)
-    
-    btn.categoryId = category.id
-    btn:SetScript("OnClick", function(self)
-        ShowSection(self.categoryId)
-    end)
-    
-    btn:SetScript("OnEnter", function(self)
-        if currentCategory ~= self.categoryId then
-            self:SetBackdropColor(0.2, 0.2, 0.2, 0.8)
-        end
-    end)
-    
-    btn:SetScript("OnLeave", function(self)
-        if currentCategory ~= self.categoryId then
-            self:SetBackdropColor(0.1, 0.1, 0.1, 0.5)
-        end
-    end)
-    
-    table.insert(navButtons, btn)
-    yOffset = yOffset - 35
-end
-
--- ========================================
--- GENERAL SECTION
--- ========================================
-local generalSection = CreateFrame("Frame", nil, scrollChild)
-generalSection:SetPoint("TOPLEFT", 20, -20)
-generalSection:SetPoint("TOPRIGHT", -20, -20)
-generalSection:SetHeight(400)
-contentSections["general"] = generalSection
-
-local generalTitle = generalSection:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-generalTitle:SetPoint("TOPLEFT", 0, 0)
-generalTitle:SetText("General Settings")
-
--- Enabled Cities
-local citiesTitle = generalSection:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-citiesTitle:SetPoint("TOPLEFT", generalTitle, "BOTTOMLEFT", 0, -20)
-citiesTitle:SetText("Enabled Cities")
-
-local cityCheckboxes = {}
-local cityYOffset = -80
-for _, mapID in ipairs(cityOrder) do
-    local cityName = mapNames[mapID]
-    local checkbox = CreateFrame("CheckButton", nil, generalSection, "UICheckButtonTemplate")
-    checkbox:SetPoint("TOPLEFT", 0, cityYOffset)
-    
-    local label = checkbox:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    label:SetPoint("LEFT", checkbox, "RIGHT", 5, 0)
-    label:SetText(cityName)
-    
-    checkbox.mapID = mapID
-    
-    checkbox:SetScript("OnClick", function(self)
-        CityGuideConfig.enabledCities = CityGuideConfig.enabledCities or {}
-        CityGuideConfig.enabledCities[self.mapID] = self:GetChecked()
-        CityGuide_UpdateMapLabels()
-    end)
-    
-    cityCheckboxes[mapID] = checkbox
-    cityYOffset = cityYOffset - 30
-end
-
--- Profession Filter
-local profFilterTitle = generalSection:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-profFilterTitle:SetPoint("TOPLEFT", 0, cityYOffset - 20)
-profFilterTitle:SetText("Profession Filter")
-
-local profFilterCheck = CreateFrame("CheckButton", nil, generalSection, "UICheckButtonTemplate")
-profFilterCheck:SetPoint("TOPLEFT", profFilterTitle, "BOTTOMLEFT", 0, -10)
-
-local profFilterLabel = profFilterCheck:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-profFilterLabel:SetPoint("LEFT", profFilterCheck, "RIGHT", 5, 0)
-profFilterLabel:SetText("Only show my learned professions")
-
-profFilterCheck:SetScript("OnClick", function(self)
-    CityGuideConfig.filterByProfession = self:GetChecked()
-    CityGuide_UpdateMapLabels()
+openButton:SetScript("OnClick", function()
+    CityGuide_ToggleStandaloneSettings()
 end)
 
--- Faction Filter (Global)
-local factionFilterTitle = generalSection:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-factionFilterTitle:SetPoint("TOPLEFT", profFilterCheck, "BOTTOMLEFT", -20, -30)
-factionFilterTitle:SetText("Faction Filter")
+-- Button glow effect
+local btnGlow = openButton:CreateTexture(nil, "BACKGROUND")
+btnGlow:SetPoint("CENTER")
+btnGlow:SetSize(220, 60)
+btnGlow:SetTexture("Interface\\GLUES\\Models\\UI_Draenei\\GenericGlow64")
+btnGlow:SetBlendMode("ADD")
+btnGlow:SetVertexColor(1, 0.9, 0.5, 0)
 
-local factionFilterCheck = CreateFrame("CheckButton", nil, generalSection, "UICheckButtonTemplate")
-factionFilterCheck:SetPoint("TOPLEFT", factionFilterTitle, "BOTTOMLEFT", 0, -10)
-
-local factionFilterLabel = factionFilterCheck:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-factionFilterLabel:SetPoint("LEFT", factionFilterCheck, "RIGHT", 5, 0)
-factionFilterLabel:SetText("Show faction-specific POIs")
-
--- We'll set the OnClick handler later after cityFactionOnlyCheckboxes is created
-
-factionFilterCheck:SetScript("OnEnter", function(self)
-    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-    GameTooltip:SetText("Show Faction-Specific POIs")
-    GameTooltip:AddLine("Displays faction-specific NPCs and locations in all cities", 1, 1, 1, true)
-    GameTooltip:AddLine(" ", 1, 1, 1)
-    local playerFaction = CityGuide_GetPlayerFaction()
-    GameTooltip:AddLine("Your faction: |cff00ff00" .. playerFaction .. "|r", 0.8, 0.8, 0.8)
-    GameTooltip:AddLine(" ", 1, 1, 1)
-    GameTooltip:AddLine("When enabled: Shows NPCs tagged for your faction", 0.6, 0.6, 0.6, true)
-    GameTooltip:AddLine("When disabled: Hides all faction-tagged NPCs", 0.6, 0.6, 0.6, true)
-    GameTooltip:Show()
+openButton:SetScript("OnEnter", function(self)
+    btnGlow:SetAlpha(0.3)
 end)
 
-factionFilterCheck:SetScript("OnLeave", function()
-    GameTooltip:Hide()
+openButton:SetScript("OnLeave", function(self)
+    btnGlow:SetAlpha(0)
 end)
 
--- ========================================
--- DISPLAY SECTION
--- ========================================
-local displaySection = CreateFrame("Frame", nil, scrollChild)
-displaySection:SetPoint("TOPLEFT", 20, -20)
-displaySection:SetPoint("TOPRIGHT", -20, -20)
-displaySection:SetHeight(250)
-contentSections["display"] = displaySection
+-- Additional commands info
+local commandsTitle = panel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+commandsTitle:SetPoint("TOP", openButton, "BOTTOM", 0, -40)
+commandsTitle:SetText("Other useful commands:")
+commandsTitle:SetTextColor(0.8, 0.8, 0.8)
 
-local displayTitle = displaySection:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-displayTitle:SetPoint("TOPLEFT", 0, 0)
-displayTitle:SetText("Display Mode")
-
-local displayDesc = displaySection:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-displayDesc:SetPoint("TOPLEFT", displayTitle, "BOTTOMLEFT", 0, -5)
-displayDesc:SetText("Choose how to display NPCs on the map")
-
--- Radio buttons
-local labelsButton = CreateRadioButton(displaySection, "Labels Only", 0, -60)
-local iconsButton = CreateRadioButton(displaySection, "Icons Only", 0, -90)
-local bothButton = CreateRadioButton(displaySection, "Icons with Labels", 0, -120)
-local smallIconsButton = CreateRadioButton(displaySection, "Small Icons", 0, -150)
-local smallBothButton = CreateRadioButton(displaySection, "Small Icons with Labels", 0, -180)
-
-local function UpdateRadioButtons()
-    labelsButton:SetChecked(CityGuideConfig.displayMode == "labels")
-    iconsButton:SetChecked(CityGuideConfig.displayMode == "icons")
-    bothButton:SetChecked(CityGuideConfig.displayMode == "both")
-    smallIconsButton:SetChecked(CityGuideConfig.displayMode == "smallicons")
-    smallBothButton:SetChecked(CityGuideConfig.displayMode == "smallboth")
-end
-
-labelsButton:SetScript("OnClick", function()
-    CityGuideConfig.displayMode = "labels"
-    UpdateRadioButtons()
-    CityGuide_UpdateMapLabels()
-end)
-
-iconsButton:SetScript("OnClick", function()
-    CityGuideConfig.displayMode = "icons"
-    UpdateRadioButtons()
-    CityGuide_UpdateMapLabels()
-end)
-
-bothButton:SetScript("OnClick", function()
-    CityGuideConfig.displayMode = "both"
-    UpdateRadioButtons()
-    CityGuide_UpdateMapLabels()
-end)
-
-smallIconsButton:SetScript("OnClick", function()
-    CityGuideConfig.displayMode = "smallicons"
-    UpdateRadioButtons()
-    CityGuide_UpdateMapLabels()
-end)
-
-smallBothButton:SetScript("OnClick", function()
-    CityGuideConfig.displayMode = "smallboth"
-    UpdateRadioButtons()
-    CityGuide_UpdateMapLabels()
-end)
-
--- ========================================
--- SIZE SETTINGS SECTION
--- ========================================
-local sizesSection = CreateFrame("Frame", nil, scrollChild)
-sizesSection:SetPoint("TOPLEFT", 20, -20)
-sizesSection:SetPoint("TOPRIGHT", -20, -20)
-sizesSection:SetHeight(400)
-contentSections["sizes"] = sizesSection
-
-local sizesTitle = sizesSection:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-sizesTitle:SetPoint("TOPLEFT", 0, 0)
-sizesTitle:SetText("Global Size Settings")
-
-local sizesDesc = sizesSection:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-sizesDesc:SetPoint("TOPLEFT", sizesTitle, "BOTTOMLEFT", 0, -5)
-sizesDesc:SetText("Adjust the base size for all cities")
-sizesDesc:SetWidth(400)
-sizesDesc:SetJustifyH("LEFT")
-
--- Label Size
-local labelSizeTitle = sizesSection:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-labelSizeTitle:SetPoint("TOPLEFT", sizesDesc, "BOTTOMLEFT", 0, -30)
-labelSizeTitle:SetText("Label Size")
-
-local labelSizeSlider = CreateSlider(sizesSection, "CityGuideLabelSizeSlider", 0.5, 2.0, 0.1, 0, -110, 300)
-_G["CityGuideLabelSizeSliderText"]:Hide()
-
-local labelSizeValue = sizesSection:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-labelSizeValue:SetPoint("TOP", labelSizeSlider, "BOTTOM", 0, 0)
-labelSizeValue:SetText("1.0x")
-
-labelSizeSlider:SetScript("OnValueChanged", function(self, value)
-    CityGuideConfig.labelSize = value
-    labelSizeValue:SetText(string.format("%.1fx", value))
-    CityGuide_UpdateMapLabels()
-end)
-
--- Icon Size
-local iconSizeTitle = sizesSection:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-iconSizeTitle:SetPoint("TOPLEFT", labelSizeSlider, "BOTTOMLEFT", 0, -45)
-iconSizeTitle:SetText("Icon Size (Global)")
-
-local iconSizeSlider = CreateSlider(sizesSection, "CityGuideIconSizeSlider", 0.5, 2.0, 0.1, 0, -195, 300)
-_G["CityGuideIconSizeSliderText"]:Hide()
-
-local iconSizeValue = sizesSection:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-iconSizeValue:SetPoint("TOP", iconSizeSlider, "BOTTOM", 0, 0)
-iconSizeValue:SetText("1.0x")
-
-iconSizeSlider:SetScript("OnValueChanged", function(self, value)
-    CityGuideConfig.iconSize = value
-    iconSizeValue:SetText(string.format("%.1fx", value))
-    CityGuide_UpdateMapLabels()
-end)
-
--- Reset button
-local resetButton = CreateFrame("Button", nil, sizesSection, "UIPanelButtonTemplate")
-resetButton:SetSize(120, 25)
-resetButton:SetPoint("TOPLEFT", iconSizeSlider, "BOTTOMLEFT", 0, -30)
-resetButton:SetText("Reset All Sizes")
-
--- ========================================
--- PER-CITY SETTINGS SECTION (Combined)
--- ========================================
-local perCitySection = CreateFrame("Frame", nil, scrollChild)
-perCitySection:SetPoint("TOPLEFT", 20, -20)
-perCitySection:SetPoint("TOPRIGHT", -20, -20)
-perCitySection:SetHeight(2000) -- Make it tall enough for all cities
-contentSections["percity"] = perCitySection
-
-local perCityTitle = perCitySection:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-perCityTitle:SetPoint("TOPLEFT", 0, 0)
-perCityTitle:SetText("Per-City Settings")
-
-local perCityDesc = perCitySection:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-perCityDesc:SetPoint("TOPLEFT", perCityTitle, "BOTTOMLEFT", 0, -5)
-perCityDesc:SetText("Adjust settings for individual cities")
-perCityDesc:SetWidth(400)
-perCityDesc:SetJustifyH("LEFT")
-
--- Storage for all per-city controls
-local cityIconSliders = {}
-local cityIconSizeValues = {}
-local cityLabelSliders = {}
-local cityLabelSizeValues = {}
-local cityProfessionCheckboxes = {}
-local cityFactionOnlyCheckboxes = {}
-
-local perCityYOffset = -80
-
-for _, mapID in ipairs(cityOrder) do
-    local cityName = mapNames[mapID]
-    
-    -- City name header
-    local cityHeader = perCitySection:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-    cityHeader:SetPoint("TOPLEFT", 0, perCityYOffset)
-    cityHeader:SetText(cityName)
-    cityHeader:SetTextColor(1, 0.82, 0) -- Gold color
-    perCityYOffset = perCityYOffset - 30
-    
-    -- Icon Size Slider
-    local iconLabel = perCitySection:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    iconLabel:SetPoint("TOPLEFT", 20, perCityYOffset)
-    iconLabel:SetText("Icon Size")
-    
-    local iconSlider = CreateSlider(perCitySection, "CityGuide"..cityName:gsub("[^%w]", "").."IconSlider", 0.5, 2.0, 0.1, 20, perCityYOffset - 20, 250)
-    _G["CityGuide"..cityName:gsub("[^%w]", "").."IconSliderText"]:Hide()
-    
-    local iconValue = perCitySection:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-    iconValue:SetPoint("TOP", iconSlider, "BOTTOM", 0, 0)
-    iconValue:SetText("1.0x")
-    
-    iconSlider:SetScript("OnValueChanged", function(self, value)
-        CityGuideConfig.cityIconSizes[mapID] = value
-        iconValue:SetText(string.format("%.1fx", value))
-        CityGuide_UpdateMapLabels()
-    end)
-    
-    cityIconSliders[mapID] = iconSlider
-    cityIconSizeValues[mapID] = iconValue
-    perCityYOffset = perCityYOffset - 65
-    
-    -- Label Size Slider
-    local labelLabel = perCitySection:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    labelLabel:SetPoint("TOPLEFT", 20, perCityYOffset)
-    labelLabel:SetText("Label Size")
-    
-    local labelSlider = CreateSlider(perCitySection, "CityGuide"..cityName:gsub("[^%w]", "").."LabelSlider", 0.5, 2.0, 0.1, 20, perCityYOffset - 20, 250)
-    _G["CityGuide"..cityName:gsub("[^%w]", "").."LabelSliderText"]:Hide()
-    
-    local labelValue = perCitySection:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-    labelValue:SetPoint("TOP", labelSlider, "BOTTOM", 0, 0)
-    labelValue:SetText("1.0x")
-    
-    labelSlider:SetScript("OnValueChanged", function(self, value)
-        CityGuideConfig.cityLabelSizes = CityGuideConfig.cityLabelSizes or {}
-        CityGuideConfig.cityLabelSizes[mapID] = value
-        labelValue:SetText(string.format("%.1fx", value))
-        CityGuide_UpdateMapLabels()
-    end)
-    
-    cityLabelSliders[mapID] = labelSlider
-    cityLabelSizeValues[mapID] = labelValue
-    perCityYOffset = perCityYOffset - 65
-    
-    -- Condense Profession Tables Checkbox (only if city allows it)
-    if allowCondensation[mapID] == true then
-        local profCheckbox = CreateFrame("CheckButton", nil, perCitySection, "UICheckButtonTemplate")
-        profCheckbox:SetPoint("TOPLEFT", 20, perCityYOffset)
-        
-        local profLabel = profCheckbox:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-        profLabel:SetPoint("LEFT", profCheckbox, "RIGHT", 5, 0)
-        profLabel:SetText("Condense Profession Tables")
-        
-        profCheckbox.mapID = mapID
-        profCheckbox:SetScript("OnClick", function(self)
-            CityGuideConfig.condenseProfessions = CityGuideConfig.condenseProfessions or {}
-            CityGuideConfig.condenseProfessions[self.mapID] = self:GetChecked()
-            CityGuide_UpdateMapLabels()
-        end)
-        
-        profCheckbox:SetScript("OnEnter", function(self)
-            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-            GameTooltip:SetText("Condense Profession Tables")
-            GameTooltip:AddLine("Groups all profession trainers into a single 'Profession Tables' label", 1, 1, 1, true)
-            GameTooltip:AddLine(" ", 1, 1, 1)
-            GameTooltip:AddLine("Note: Overridden by 'Filter My Professions' - when that's active, your professions show individually", 0.8, 0.8, 0.8, true)
-            GameTooltip:Show()
-        end)
-        
-        profCheckbox:SetScript("OnLeave", function()
-            GameTooltip:Hide()
-        end)
-        
-        cityProfessionCheckboxes[mapID] = profCheckbox
-        perCityYOffset = perCityYOffset - 50
-    end
-    
-    -- Show Faction POIs Only Checkbox (only for Silvermoon - mapID 2393)
-    if mapID == 2393 then
-        local factionOnlyCheckbox = CreateFrame("CheckButton", nil, perCitySection, "UICheckButtonTemplate")
-        factionOnlyCheckbox:SetPoint("TOPLEFT", 20, perCityYOffset)
-        
-        local factionOnlyLabel = factionOnlyCheckbox:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-        factionOnlyLabel:SetPoint("LEFT", factionOnlyCheckbox, "RIGHT", 5, 0)
-        factionOnlyLabel:SetText("Faction POIs Only (Horde)")
-        
-        factionOnlyCheckbox.mapID = mapID
-        factionOnlyCheckbox:SetScript("OnClick", function(self)
-            CityGuideConfig.factionPOIsOnly = CityGuideConfig.factionPOIsOnly or {}
-            CityGuideConfig.factionPOIsOnly[self.mapID] = self:GetChecked()
-            CityGuide_UpdateMapLabels()
-        end)
-        
-        factionOnlyCheckbox:SetScript("OnEnter", function(self)
-            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-            GameTooltip:SetText("Faction POIs Only Mode")
-            
-            if not CityGuideConfig.showFactionPOIs then
-                GameTooltip:AddLine("|cffff0000Requires 'Show faction-specific POIs' to be enabled|r", 1, 1, 1, true)
-                GameTooltip:AddLine("(Found in General Settings tab)", 0.8, 0.8, 0.8)
-            else
-                GameTooltip:AddLine("Shows your faction's POIs, intelligently hiding duplicates", 1, 1, 1, true)
-                GameTooltip:AddLine(" ", 1, 1, 1)
-                local playerFaction = CityGuide_GetPlayerFaction()
-                GameTooltip:AddLine("Your faction: |cff00ff00" .. playerFaction .. "|r", 0.8, 0.8, 0.8)
-                GameTooltip:AddLine(" ", 1, 1, 1)
-                GameTooltip:AddLine("How it works:", 0.5, 1, 0.5)
-                GameTooltip:AddLine("• Shows faction-specific POIs for your faction", 1, 1, 1, true)
-                GameTooltip:AddLine("• Hides neutral POIs only when a faction version exists", 1, 1, 1, true)
-                GameTooltip:AddLine("• Keeps neutral POIs with no faction alternative (e.g., Barber)", 1, 1, 1, true)
-                GameTooltip:AddLine(" ", 1, 1, 1)
-                GameTooltip:AddLine("Perfect for removing duplicate Banks/Inns while keeping unique services!", 0.8, 0.8, 0.8, true)
-            end
-            
-            GameTooltip:Show()
-        end)
-        
-        factionOnlyCheckbox:SetScript("OnLeave", function()
-            GameTooltip:Hide()
-        end)
-        
-        cityFactionOnlyCheckboxes[mapID] = factionOnlyCheckbox
-        perCityYOffset = perCityYOffset - 50
-    end
-    
-    -- Separator line
-    perCityYOffset = perCityYOffset - 20
-end
-
--- Now set up the faction filter checkbox OnClick handler after cityFactionOnlyCheckboxes is populated
-factionFilterCheck:SetScript("OnClick", function(self)
-    CityGuideConfig.showFactionPOIs = self:GetChecked()
-    
-    -- If disabling faction POIs, also disable Faction POIs Only mode
-    if not self:GetChecked() then
-        CityGuideConfig.factionPOIsOnly = CityGuideConfig.factionPOIsOnly or {}
-        for mapID, _ in pairs(CityGuideConfig.factionPOIsOnly) do
-            CityGuideConfig.factionPOIsOnly[mapID] = false
-        end
-        -- Update UI checkboxes if they exist
-        if cityFactionOnlyCheckboxes then
-            for mapID, checkbox in pairs(cityFactionOnlyCheckboxes) do
-                if checkbox then
-                    checkbox:SetChecked(false)
-                    checkbox:Disable()
-                end
-            end
-        end
-    else
-        -- Re-enable Faction POIs Only checkboxes when turning on faction POIs
-        if cityFactionOnlyCheckboxes then
-            for mapID, checkbox in pairs(cityFactionOnlyCheckboxes) do
-                if checkbox then
-                    checkbox:Enable()
-                end
-            end
-        end
-    end
-    
-    CityGuide_UpdateMapLabels()
-end)
-
--- Update reset button to include per-city sizes and profession condensation
-resetButton:SetScript("OnClick", function()
-    CityGuideConfig.labelSize = 1.0
-    CityGuideConfig.iconSize = 1.0
-    CityGuideConfig.cityIconSizes = {}
-    CityGuideConfig.cityLabelSizes = {}
-    CityGuideConfig.condenseProfessions = {}
-    labelSizeSlider:SetValue(1.0)
-    iconSizeSlider:SetValue(1.0)
-    labelSizeValue:SetText("1.0x")
-    iconSizeValue:SetText("1.0x")
-    
-    for mapID, slider in pairs(cityIconSliders) do
-        slider:SetValue(1.0)
-        cityIconSizeValues[mapID]:SetText("1.0x")
-    end
-    
-    for mapID, slider in pairs(cityLabelSliders) do
-        slider:SetValue(1.0)
-        cityLabelSizeValues[mapID]:SetText("1.0x")
-    end
-    
-    for mapID, checkbox in pairs(cityProfessionCheckboxes) do
-        checkbox:SetChecked(false)
-    end
-    
-    CityGuide_UpdateMapLabels()
-    print("|cff00ff00City Guide:|r All sizes reset to default")
-end)
-
--- Update function when panel is shown
-panel:SetScript("OnShow", function()
-    UpdateRadioButtons()
-    
-    CityGuideConfig.enabledCities = CityGuideConfig.enabledCities or {}
-    
-    for mapID, checkbox in pairs(cityCheckboxes) do
-        if CityGuideConfig.enabledCities[mapID] == nil then
-            checkbox:SetChecked(true)
-        else
-            checkbox:SetChecked(CityGuideConfig.enabledCities[mapID])
-        end
-    end
-    
-    profFilterCheck:SetChecked(CityGuideConfig.filterByProfession)
-    factionFilterCheck:SetChecked(CityGuideConfig.showFactionPOIs)
-    labelSizeSlider:SetValue(CityGuideConfig.labelSize or 1.0)
-    iconSizeSlider:SetValue(CityGuideConfig.iconSize or 1.0)
-    labelSizeValue:SetText(string.format("%.1fx", CityGuideConfig.labelSize or 1.0))
-    iconSizeValue:SetText(string.format("%.1fx", CityGuideConfig.iconSize or 1.0))
-    
-    for mapID, slider in pairs(cityIconSliders) do
-        local citySize = CityGuideConfig.cityIconSizes[mapID] or 1.0
-        slider:SetValue(citySize)
-        cityIconSizeValues[mapID]:SetText(string.format("%.1fx", citySize))
-    end
-    
-    for mapID, slider in pairs(cityLabelSliders) do
-        local citySize = CityGuideConfig.cityLabelSizes[mapID] or 1.0
-        slider:SetValue(citySize)
-        cityLabelSizeValues[mapID]:SetText(string.format("%.1fx", citySize))
-    end
-    
-    -- Apply defaults and update checkboxes for profession condensation
-    CityGuideConfig.condenseProfessions = CityGuideConfig.condenseProfessions or {}
-    for mapID, checkbox in pairs(cityProfessionCheckboxes) do
-        if checkbox then
-            -- If this is first time and no saved value, apply default
-            if CityGuideConfig.condenseProfessions[mapID] == nil then
-                CityGuideConfig.condenseProfessions[mapID] = defaultCondensation[mapID] or false
-            end
-            checkbox:SetChecked(CityGuideConfig.condenseProfessions[mapID])
-        end
-    end
-    
-    -- Update faction checkboxes
-    CityGuideConfig.factionPOIsOnly = CityGuideConfig.factionPOIsOnly or {}
-    for mapID, checkbox in pairs(cityFactionOnlyCheckboxes) do
-        if checkbox then
-            -- Set checkbox state
-            checkbox:SetChecked(CityGuideConfig.factionPOIsOnly[mapID] or false)
-            
-            -- Enable/disable based on global faction POI setting
-            if CityGuideConfig.showFactionPOIs then
-                checkbox:Enable()
-            else
-                checkbox:Disable()
-                -- Also uncheck if global setting is off
-                checkbox:SetChecked(false)
-                CityGuideConfig.factionPOIsOnly[mapID] = false
-            end
-        end
-    end
-    
-    ShowSection("general")
-end)
+local commandsList = panel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+commandsList:SetPoint("TOP", commandsTitle, "BOTTOM", 0, -10)
+commandsList:SetText(
+    "|cff00ff00/cg toggle|r - Cycle display modes\n" ..
+    "|cff00ff00/cg prof|r - Toggle profession filter\n" ..
+    "|cff00ff00/cg decor|r - Toggle decor POIs"
+)
+commandsList:SetSpacing(4)
 
 -- Register the panel
 if Settings and Settings.RegisterCanvasLayoutCategory then

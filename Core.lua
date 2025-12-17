@@ -16,6 +16,7 @@ CityGuideConfig.cityLabelSizes = CityGuideConfig.cityLabelSizes or {}
 CityGuideConfig.condenseProfessions = CityGuideConfig.condenseProfessions or {}
 CityGuideConfig.showFactionPOIs = CityGuideConfig.showFactionPOIs or false
 CityGuideConfig.factionPOIsOnly = CityGuideConfig.factionPOIsOnly or {}
+CityGuideConfig.showDecorPOIs = CityGuideConfig.showDecorPOIs ~= false -- Default to true
 
 -- Function to clear old labels
 local function ClearLabels()
@@ -31,6 +32,24 @@ local function FilterNPCsByFaction(npcList, mapID)
     for _, npc in ipairs(npcList) do
         if CityGuide_ShouldShowNPCByFaction(npc, mapID, npcList) then
             table.insert(filtered, npc)
+        end
+    end
+    return filtered
+end
+
+-- Function to filter NPCs by decor setting
+local function FilterNPCsByDecor(npcList)
+    local filtered = {}
+    for _, npc in ipairs(npcList) do
+        if CityGuide_ShouldShowNPCByDecor(npc) then
+            -- Create a copy of the NPC with cleaned name
+            local cleanedNPC = {}
+            for k, v in pairs(npc) do
+                cleanedNPC[k] = v
+            end
+            -- Clean the name (removes "Decor" from middle of names when setting is off)
+            cleanedNPC.name = CityGuide_CleanDecorFromName(npc.name)
+            table.insert(filtered, cleanedNPC)
         end
     end
     return filtered
@@ -84,8 +103,11 @@ function CityGuide_UpdateMapLabels()
     -- Apply faction filter first
     local factionFilteredList = FilterNPCsByFaction(fullNPCList, mapID)
     
-    -- Then apply profession filter
-    local filteredNPCList = CityGuide_FilterNPCsByProfession(factionFilteredList)
+    -- Then apply decor filter
+    local decorFilteredList = FilterNPCsByDecor(factionFilteredList)
+    
+    -- Finally apply profession filter
+    local filteredNPCList = CityGuide_FilterNPCsByProfession(decorFilteredList)
 
     if CityGuideConfig.displayMode == "icons" then
         -- Icons only - NO CLUSTERING, use original positions, regular square icons

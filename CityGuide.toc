@@ -14,4 +14,10 @@ ProfessionFilter.lua
 UI.lua
 Core.lua
 Commands.lua
+SettingsGeneral.lua
+SettingsFilters.lua
+SettingsDisplay.lua
+SettingsSizes.lua
+SettingsCityTemplate.lua
 Settings.lua
+SettingsWindow.lua

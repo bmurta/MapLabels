@@ -218,6 +218,14 @@ local function HandleSlashCommand(msg)
             print("|cff00ff00City Guide:|r Profession filter disabled")
         end
         CityGuide_UpdateMapLabels()
+    elseif cmd == "decor" then
+        CityGuideConfig.showDecorPOIs = not CityGuideConfig.showDecorPOIs
+        if CityGuideConfig.showDecorPOIs then
+            print("|cff00ff00City Guide:|r Decor POIs enabled")
+        else
+            print("|cff00ff00City Guide:|r Decor POIs disabled")
+        end
+        CityGuide_UpdateMapLabels()
     elseif cmd == "labelsize" then
         local size = tonumber(arg)
         if size and size >= 0.5 and size <= 2.0 then
@@ -243,6 +251,9 @@ local function HandleSlashCommand(msg)
         CityGuideConfig.iconSize = 1.0
         print("|cff00ff00City Guide:|r Sizes reset to default (1.0x)")
         CityGuide_UpdateMapLabels()
+    elseif cmd == "settings" or cmd == "config" or cmd == "options" then
+        -- Open standalone settings window
+        CityGuide_ToggleStandaloneSettings()
     -- Dev commands (hidden from help)
     elseif cmd == "capture" then
         if arg and arg ~= "" then
@@ -260,11 +271,13 @@ local function HandleSlashCommand(msg)
         HandleZoneID()
     else
         print("|cff00ff00City Guide Commands:|r")
+        print("/cg settings - Open settings window")
         print("/cg labels - Show labels only")
         print("/cg icons - Show icons only")
         print("/cg both - Show icons with labels")
         print("/cg toggle - Cycle through modes")
         print("/cg prof - Toggle profession filter")
+        print("/cg decor - Toggle decor POIs")
         print("/cg labelsize <0.5-2.0> - Set label size")
         print("/cg iconsize <0.5-2.0> - Set icon size")
         print("/cg resetsize - Reset sizes to default")
