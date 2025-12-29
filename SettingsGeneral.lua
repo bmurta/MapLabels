@@ -7,7 +7,7 @@ function CityGuideSettings_LoadGeneralSection()
     local generalSection = CreateFrame("Frame", nil, scrollChild)
     generalSection:SetPoint("TOPLEFT", 20, -20)
     generalSection:SetPoint("TOPRIGHT", -20, -20)
-    generalSection:SetHeight(600)
+    generalSection:SetHeight(700)
     CityGuideSettings.contentSections["general"] = generalSection
     
     -- Section title with icon
@@ -81,7 +81,8 @@ function CityGuideSettings_LoadGeneralSection()
     
     -- Store references for updates
     generalSection.cityCheckboxes = cityCheckboxes
-    end
+end
+
 function CityGuideSettings_UpdateGeneralSection()
     local section = CityGuideSettings.contentSections["general"]
     if not section then return end

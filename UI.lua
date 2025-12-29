@@ -11,7 +11,7 @@ local modeIcons = {
     icons = "Interface\\Icons\\Ability_Spy",              -- Spyglass for viewing/finding
     both = "Interface\\Icons\\INV_Misc_Map02",             -- Map icon for both
     smallicons = "Interface\\Minimap\\Tracking\\Banker",   -- Small icon style
-    smallboth = "Interface\\Icons\\INV_Misc_Map_01"        -- Small icons with labels
+    smallboth = "Interface\\Cursor\\Crosshair\\workorders"        -- Small icons with labels
 }
 
 -- Function to create a label (text only)
@@ -98,7 +98,7 @@ function CityGuide_CreateTextLabel(parent, x, y, text, scale, textDirection, col
 end
 
 -- Function to create icon only
-function CityGuide_CreateIconOnly(parent, x, y, iconPath, minimapIcon, scale, sizeMultiplier)
+function CityGuide_CreateIconOnly(parent, x, y, iconPath, minimapIcon, scale, sizeMultiplier, tooltipText)
     scale = scale or 1.0
     sizeMultiplier = sizeMultiplier or 1.0
     
@@ -140,6 +140,36 @@ function CityGuide_CreateIconOnly(parent, x, y, iconPath, minimapIcon, scale, si
         icon:SetTexture(iconPath)
     end
 
+    -- Add tooltip if tooltipText is provided
+    if tooltipText and CityGuideConfig.useTooltips then
+        container:EnableMouse(true)
+        container:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            
+            -- Check if text contains line breaks
+            local lines = {}
+            for line in tooltipText:gmatch("[^\n]+") do
+                table.insert(lines, line)
+            end
+            
+            if #lines > 1 then
+                -- Multi-line tooltip - add first line as title, rest as centered lines
+                GameTooltip:SetText(lines[1], 1, 1, 1, 1, true)
+                for i = 2, #lines do
+                    GameTooltip:AddLine(lines[i], 1, 1, 1, true) -- true = wrap text
+                end
+            else
+                -- Single line tooltip
+                GameTooltip:SetText(tooltipText, 1, 1, 1, 1, true)
+            end
+            
+            GameTooltip:Show()
+        end)
+        container:SetScript("OnLeave", function(self)
+            GameTooltip:Hide()
+        end)
+    end
+
     local mapWidth = parent:GetWidth()
     local mapHeight = parent:GetHeight()
     container:SetPoint("CENTER", parent, "TOPLEFT", x * mapWidth, -y * mapHeight)
@@ -172,7 +202,31 @@ function CityGuide_CreateOrUpdateMapButton()
             insets = { left = 3, right = 3, top = 3, bottom = 3 }
         })
         buttonContainer:SetBackdropColor(0, 0, 0, 0.8)
-        buttonContainer:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+        
+        -- Create a glow texture for mode indication
+        local modeGlow = buttonContainer:CreateTexture(nil, "BACKGROUND")
+        modeGlow:SetPoint("TOPLEFT", -6, 6)
+        modeGlow:SetPoint("BOTTOMRIGHT", 6, -6)
+        modeGlow:SetTexture("Interface\\GLUES\\Models\\UI_Draenei\\GenericGlow64")
+        modeGlow:SetBlendMode("ADD")
+        buttonContainer.modeGlow = modeGlow
+        
+        -- Create one-shot flash animation for mode changes
+        local flashAnim = modeGlow:CreateAnimationGroup()
+        
+        local flash1 = flashAnim:CreateAnimation("Alpha")
+        flash1:SetFromAlpha(1)
+        flash1:SetToAlpha(0.3)
+        flash1:SetDuration(0.15)
+        flash1:SetOrder(1)
+        
+        local flash2 = flashAnim:CreateAnimation("Alpha")
+        flash2:SetFromAlpha(0.3)
+        flash2:SetToAlpha(1)
+        flash2:SetDuration(0.15)
+        flash2:SetOrder(2)
+        
+        buttonContainer.flashAnim = flashAnim
         
         -- Create profession filter as a standard checkbox
         profFilterButton = CreateFrame("CheckButton", "CityGuideProfFilterButton", buttonContainer, "UICheckButtonTemplate")
@@ -227,51 +281,126 @@ function CityGuide_CreateOrUpdateMapButton()
         modeIcon:SetTexture(modeIcons[CityGuideConfig.displayMode] or modeIcons["labels"])
         mapButton.icon = modeIcon
         
-        mapButton:SetScript("OnClick", function(self)
-            if CityGuideConfig.displayMode == "labels" then
-                CityGuideConfig.displayMode = "icons"
-            elseif CityGuideConfig.displayMode == "icons" then
-                CityGuideConfig.displayMode = "both"
-            elseif CityGuideConfig.displayMode == "both" then
-                CityGuideConfig.displayMode = "smallicons"
-            elseif CityGuideConfig.displayMode == "smallicons" then
-                CityGuideConfig.displayMode = "smallboth"
+        mapButton:SetScript("OnClick", function(self, button)
+            if button == "RightButton" then
+                -- Right-click: Toggle tooltip mode ON/OFF
+                CityGuideConfig.useTooltips = not CityGuideConfig.useTooltips
+                
+                if CityGuideConfig.useTooltips then
+                    -- Switching TO tooltip mode - default to "both" (icons with tooltips)
+                    CityGuideConfig.displayMode = "both"
+                    print("|cff00ff00City Guide:|r Tooltip mode enabled - Icons with Tooltips")
+                else
+                    -- Switching to text mode - default to "labels"
+                    CityGuideConfig.displayMode = "labels"
+                    print("|cff00ff00City Guide:|r Text mode enabled - Labels Only")
+                end
+                
+                -- Update icon immediately
+                self.icon:SetTexture(modeIcons[CityGuideConfig.displayMode] or modeIcons["labels"])
+                CityGuide_UpdateMapLabels()
+                
+                -- Update button container appearance
+                CityGuide_CreateOrUpdateMapButton()
+                
+                -- Force refresh tooltip if it's showing
+                if GameTooltip:IsOwned(self) then
+                    GameTooltip:Hide()
+                    self:GetScript("OnEnter")(self)
+                end
             else
-                CityGuideConfig.displayMode = "labels"
+                -- Left-click: Cycle through modes based on tooltip state
+                if CityGuideConfig.useTooltips then
+                    -- Tooltip mode: Only cycle through labels, both, smallboth
+                    if CityGuideConfig.displayMode == "labels" then
+                        CityGuideConfig.displayMode = "both"
+                    elseif CityGuideConfig.displayMode == "both" then
+                        CityGuideConfig.displayMode = "smallboth"
+                    else
+                        CityGuideConfig.displayMode = "labels"
+                    end
+                else
+                    -- Legacy mode: Cycle through all 5 modes
+                    if CityGuideConfig.displayMode == "labels" then
+                        CityGuideConfig.displayMode = "icons"
+                    elseif CityGuideConfig.displayMode == "icons" then
+                        CityGuideConfig.displayMode = "both"
+                    elseif CityGuideConfig.displayMode == "both" then
+                        CityGuideConfig.displayMode = "smallicons"
+                    elseif CityGuideConfig.displayMode == "smallicons" then
+                        CityGuideConfig.displayMode = "smallboth"
+                    else
+                        CityGuideConfig.displayMode = "labels"
+                    end
+                end
+                
+                -- Update icon immediately
+                self.icon:SetTexture(modeIcons[CityGuideConfig.displayMode] or modeIcons["labels"])
+                CityGuide_UpdateMapLabels()
+                
+                -- Update button container appearance
+                CityGuide_CreateOrUpdateMapButton()
+                
+                -- Force refresh tooltip if it's showing
+                if GameTooltip:IsOwned(self) then
+                    GameTooltip:Hide()
+                    self:GetScript("OnEnter")(self)
+                end
+                
+                -- Print mode name
+                local modeName
+                if CityGuideConfig.useTooltips then
+                    modeName = CityGuideConfig.displayMode == "labels" and "Labels Only" or
+                              CityGuideConfig.displayMode == "both" and "Icons with Tooltips" or
+                              "Small Icons with Tooltips"
+                else
+                    modeName = CityGuideConfig.displayMode == "labels" and "Labels Only" or
+                              CityGuideConfig.displayMode == "icons" and "Icons Only" or
+                              CityGuideConfig.displayMode == "both" and "Icons with Labels" or
+                              CityGuideConfig.displayMode == "smallicons" and "Small Icons" or
+                              "Small Icons with Labels"
+                end
+                print("|cff00ff00City Guide:|r " .. modeName)
             end
-            
-            -- Update icon immediately
-            self.icon:SetTexture(modeIcons[CityGuideConfig.displayMode] or modeIcons["labels"])
-            CityGuide_UpdateMapLabels()
-            
-            -- Force refresh tooltip if it's showing
-            if GameTooltip:IsOwned(self) then
-                GameTooltip:Hide()
-                self:GetScript("OnEnter")(self)
-            end
-            
-            local modeName = CityGuideConfig.displayMode == "labels" and "Labels Only" or
-                            CityGuideConfig.displayMode == "icons" and "Icons Only" or
-                            CityGuideConfig.displayMode == "both" and "Icons with Labels" or
-                            CityGuideConfig.displayMode == "smallicons" and "Small Icons" or
-                            "Small Icons with Labels"
-            print("|cff00ff00City Guide:|r " .. modeName)
         end)
+        
+        -- Register for right-click
+        mapButton:RegisterForClicks("LeftButtonUp", "RightButtonUp")
         
         mapButton:SetScript("OnEnter", function(self)
             self.icon:SetVertexColor(1, 1, 0.5)
             
-            local modeName = CityGuideConfig.displayMode == "labels" and "Labels Only" or
-                            CityGuideConfig.displayMode == "icons" and "Icons Only" or
-                            CityGuideConfig.displayMode == "both" and "Icons with Labels" or
-                            CityGuideConfig.displayMode == "smallicons" and "Small Icons" or
-                            "Small Icons with Labels"
+            -- Determine mode name based on current settings
+            local modeName
+            if CityGuideConfig.useTooltips then
+                -- Tooltip mode - only 3 modes available
+                modeName = CityGuideConfig.displayMode == "labels" and "Labels Only" or
+                          CityGuideConfig.displayMode == "both" and "Icons with Tooltips" or
+                          "Small Icons with Tooltips"
+            else
+                -- Legacy mode - all 5 modes available
+                modeName = CityGuideConfig.displayMode == "labels" and "Labels Only" or
+                          CityGuideConfig.displayMode == "icons" and "Icons Only" or
+                          CityGuideConfig.displayMode == "both" and "Icons with Labels" or
+                          CityGuideConfig.displayMode == "smallicons" and "Small Icons" or
+                          "Small Icons with Labels"
+            end
             
             GameTooltip:SetOwner(self, "ANCHOR_LEFT")
             GameTooltip:SetText("City Guide Display")
             GameTooltip:AddLine("Current: |cff00ff00" .. modeName .. "|r", 1, 1, 1)
             GameTooltip:AddLine(" ", 1, 1, 1)
-            GameTooltip:AddLine("Click to cycle modes", 0.8, 0.8, 0.8)
+            
+            if CityGuideConfig.useTooltips then
+                GameTooltip:AddLine("|cffFFD700Tooltip Mode:|r ON", 0.5, 1, 0.5)
+                GameTooltip:AddLine("Left-click: Cycle (3 modes)", 0.8, 0.8, 0.8)
+                GameTooltip:AddLine("Right-click: Switch to Text Mode", 0.8, 0.8, 0.8)
+            else
+                GameTooltip:AddLine("|cffFFD700Text Mode:|r ON", 0.8, 0.8, 0.8)
+                GameTooltip:AddLine("Left-click: Cycle (5 modes)", 0.8, 0.8, 0.8)
+                GameTooltip:AddLine("Right-click: Switch to Tooltip Mode", 0.8, 0.8, 0.8)
+            end
+            
             GameTooltip:Show()
         end)
         
@@ -286,6 +415,23 @@ function CityGuide_CreateOrUpdateMapButton()
     
     -- Update mode icon
     mapButton.icon:SetTexture(modeIcons[CityGuideConfig.displayMode] or modeIcons["labels"])
+    
+    -- Update border glow based on mode - MUCH MORE VISIBLE
+    if CityGuideConfig.useTooltips then
+        -- Tooltip mode: Bright Blue/cyan glow
+        buttonContainer:SetBackdropBorderColor(0.2, 0.6, 1, 1)
+        buttonContainer.modeGlow:SetVertexColor(0.3, 0.8, 1, 1)
+    else
+        -- Text mode: Bright Orange/amber glow
+        buttonContainer:SetBackdropBorderColor(1, 0.6, 0.2, 1)
+        buttonContainer.modeGlow:SetVertexColor(1, 0.7, 0.2, 1)
+    end
+    
+    -- Play flash animation when mode changes
+    if buttonContainer.flashAnim then
+        buttonContainer.flashAnim:Stop()
+        buttonContainer.flashAnim:Play()
+    end
     
     buttonContainer:Show()
 end

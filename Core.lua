@@ -17,6 +17,7 @@ CityGuideConfig.condenseProfessions = CityGuideConfig.condenseProfessions or {}
 CityGuideConfig.showFactionPOIs = CityGuideConfig.showFactionPOIs or false
 CityGuideConfig.factionPOIsOnly = CityGuideConfig.factionPOIsOnly or {}
 CityGuideConfig.showDecorPOIs = CityGuideConfig.showDecorPOIs ~= false -- Default to true
+CityGuideConfig.useTooltips = CityGuideConfig.useTooltips or false -- Default to false
 
 -- Function to clear old labels
 local function ClearLabels()
@@ -163,92 +164,114 @@ function CityGuide_UpdateMapLabels()
         
     elseif CityGuideConfig.displayMode == "both" then
         -- Icons + Labels mode (regular square icons)
-        -- IMPORTANT: Show icons for FILTERED list (ALL icons stay, including professions)
-        for i, npc in ipairs(filteredNPCList) do
-            local icon = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, nil, scale, finalIconSize)
-            table.insert(activeLabels, icon)
-        end
         
-        -- Apply profession condensation ONLY for labels
-        local labelList = filteredNPCList
-        CityGuideConfig.condenseProfessions = CityGuideConfig.condenseProfessions or {}
-        if CityGuideConfig.condenseProfessions[mapID] and not CityGuideConfig.filterByProfession then
-            local professionHubs = CityGuideProfessionHubs and CityGuideProfessionHubs[mapID]
-            if professionHubs then
-                labelList = CityGuide_FilterAndAddProfessionHubs(filteredNPCList, professionHubs)
+        if CityGuideConfig.useTooltips then
+            -- Tooltip mode: Show icons with tooltips instead of labels
+            -- NO CLUSTERING - each icon gets its own individual tooltip
+            for i, npc in ipairs(filteredNPCList) do
+                local icon = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, nil, scale, finalIconSize, npc.name)
+                table.insert(activeLabels, icon)
             end
-        end
-        
-        -- Cluster the label list (may have hubs instead of individual professions)
-        local clusters = CityGuide_ClusterNPCs(labelList)
-        
-        for _, cluster in ipairs(clusters) do
-            local centerX, centerY
-            local color, textDirection, labelDistance
-            
-            -- Check if this is a profession hub marker
-            if cluster[1].isProfessionHub then
-                local hub = cluster[1]
-                centerX = hub.x
-                centerY = hub.y
-                color = hub.color or "00FF00"
-                textDirection = hub.textDirection or "down"
-                labelDistance = hub.labelDistance or 1.0
-            else
-                centerX, centerY = CityGuide_GetClusterCenter(cluster)
-                color = cluster[1].color or "FFFFFF"
-                textDirection = cluster[1].textDirection or "down"
-                labelDistance = cluster[1].labelDistance or 1.0
+        else
+            -- Normal mode: Show icons and labels
+            -- Show icons for FILTERED list (ALL icons stay, including professions)
+            for i, npc in ipairs(filteredNPCList) do
+                local icon = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, nil, scale, finalIconSize)
+                table.insert(activeLabels, icon)
             end
             
-            local labelText = CityGuide_GetClusterLabel(cluster)
-            local label = CityGuide_CreateTextLabel(canvas, centerX, centerY, labelText, scale, textDirection, color, labelDistance, finalLabelSize)
-            table.insert(activeLabels, label)
+            -- Apply profession condensation ONLY for labels
+            local labelList = filteredNPCList
+            CityGuideConfig.condenseProfessions = CityGuideConfig.condenseProfessions or {}
+            if CityGuideConfig.condenseProfessions[mapID] and not CityGuideConfig.filterByProfession then
+                local professionHubs = CityGuideProfessionHubs and CityGuideProfessionHubs[mapID]
+                if professionHubs then
+                    labelList = CityGuide_FilterAndAddProfessionHubs(filteredNPCList, professionHubs)
+                end
+            end
+            
+            -- Cluster the label list (may have hubs instead of individual professions)
+            local clusters = CityGuide_ClusterNPCs(labelList)
+            
+            for _, cluster in ipairs(clusters) do
+                local centerX, centerY
+                local color, textDirection, labelDistance
+                
+                -- Check if this is a profession hub marker
+                if cluster[1].isProfessionHub then
+                    local hub = cluster[1]
+                    centerX = hub.x
+                    centerY = hub.y
+                    color = hub.color or "00FF00"
+                    textDirection = hub.textDirection or "down"
+                    labelDistance = hub.labelDistance or 1.0
+                else
+                    centerX, centerY = CityGuide_GetClusterCenter(cluster)
+                    color = cluster[1].color or "FFFFFF"
+                    textDirection = cluster[1].textDirection or "down"
+                    labelDistance = cluster[1].labelDistance or 1.0
+                end
+                
+                local labelText = CityGuide_GetClusterLabel(cluster)
+                local label = CityGuide_CreateTextLabel(canvas, centerX, centerY, labelText, scale, textDirection, color, labelDistance, finalLabelSize)
+                table.insert(activeLabels, label)
+            end
         end
         
     elseif CityGuideConfig.displayMode == "smallboth" then
         -- Small Icons + Labels mode (minimap style with glow)
-        -- IMPORTANT: Show icons for FILTERED list (ALL icons stay, including professions)
-        for i, npc in ipairs(filteredNPCList) do
-            local icon = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, npc.minimapIcon, scale, finalIconSize)
-            table.insert(activeLabels, icon)
-        end
         
-        -- Apply profession condensation ONLY for labels
-        local labelList = filteredNPCList
-        CityGuideConfig.condenseProfessions = CityGuideConfig.condenseProfessions or {}
-        if CityGuideConfig.condenseProfessions[mapID] and not CityGuideConfig.filterByProfession then
-            local professionHubs = CityGuideProfessionHubs and CityGuideProfessionHubs[mapID]
-            if professionHubs then
-                labelList = CityGuide_FilterAndAddProfessionHubs(filteredNPCList, professionHubs)
+        if CityGuideConfig.useTooltips then
+            -- Tooltip mode: Show icons with tooltips instead of labels
+            -- NO CLUSTERING - each icon gets its own individual tooltip
+            for i, npc in ipairs(filteredNPCList) do
+                local icon = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, npc.minimapIcon, scale, finalIconSize, npc.name)
+                table.insert(activeLabels, icon)
             end
-        end
-        
-        -- Cluster the label list (may have hubs instead of individual professions)
-        local clusters = CityGuide_ClusterNPCs(labelList)
-        
-        for _, cluster in ipairs(clusters) do
-            local centerX, centerY
-            local color, textDirection, labelDistance
-            
-            -- Check if this is a profession hub marker
-            if cluster[1].isProfessionHub then
-                local hub = cluster[1]
-                centerX = hub.x
-                centerY = hub.y
-                color = hub.color or "00FF00"
-                textDirection = hub.textDirection or "down"
-                labelDistance = hub.labelDistance or 1.0
-            else
-                centerX, centerY = CityGuide_GetClusterCenter(cluster)
-                color = cluster[1].color or "FFFFFF"
-                textDirection = cluster[1].textDirection or "down"
-                labelDistance = cluster[1].labelDistance or 1.0
+        else
+            -- Normal mode: Show icons and labels
+            -- Show icons for FILTERED list (ALL icons stay, including professions)
+            for i, npc in ipairs(filteredNPCList) do
+                local icon = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, npc.minimapIcon, scale, finalIconSize)
+                table.insert(activeLabels, icon)
             end
             
-            local labelText = CityGuide_GetClusterLabel(cluster)
-            local label = CityGuide_CreateTextLabel(canvas, centerX, centerY, labelText, scale, textDirection, color, labelDistance, finalLabelSize)
-            table.insert(activeLabels, label)
+            -- Apply profession condensation ONLY for labels
+            local labelList = filteredNPCList
+            CityGuideConfig.condenseProfessions = CityGuideConfig.condenseProfessions or {}
+            if CityGuideConfig.condenseProfessions[mapID] and not CityGuideConfig.filterByProfession then
+                local professionHubs = CityGuideProfessionHubs and CityGuideProfessionHubs[mapID]
+                if professionHubs then
+                    labelList = CityGuide_FilterAndAddProfessionHubs(filteredNPCList, professionHubs)
+                end
+            end
+            
+            -- Cluster the label list (may have hubs instead of individual professions)
+            local clusters = CityGuide_ClusterNPCs(labelList)
+            
+            for _, cluster in ipairs(clusters) do
+                local centerX, centerY
+                local color, textDirection, labelDistance
+                
+                -- Check if this is a profession hub marker
+                if cluster[1].isProfessionHub then
+                    local hub = cluster[1]
+                    centerX = hub.x
+                    centerY = hub.y
+                    color = hub.color or "00FF00"
+                    textDirection = hub.textDirection or "down"
+                    labelDistance = hub.labelDistance or 1.0
+                else
+                    centerX, centerY = CityGuide_GetClusterCenter(cluster)
+                    color = cluster[1].color or "FFFFFF"
+                    textDirection = cluster[1].textDirection or "down"
+                    labelDistance = cluster[1].labelDistance or 1.0
+                end
+                
+                local labelText = CityGuide_GetClusterLabel(cluster)
+                local label = CityGuide_CreateTextLabel(canvas, centerX, centerY, labelText, scale, textDirection, color, labelDistance, finalLabelSize)
+                table.insert(activeLabels, label)
+            end
         end
     end
 end

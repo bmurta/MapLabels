@@ -442,7 +442,7 @@ CityGuideNPCData = {
         {
             x = 59.60 / 100, 
             y = 47.64 / 100, 
-            name = "Remix Decor\n(Sewers)", 
+            name = "Decor Remix\n(Sewers)", 
             icon = "Interface\\Housing\\inv_12ph_genericfixture",
             minimapIcon = MINIMAP_ICONS.DECOR,
             labelDistance = 1.5
@@ -452,7 +452,7 @@ CityGuideNPCData = {
         {
         x = 67.52/ 100, 
         y = 63.06 / 100, 
-        name = "Remix Decor", 
+        name = "Decor", 
         icon = "Interface\\Housing\\inv_12ph_genericfixture",
         minimapIcon = MINIMAP_ICONS.DECOR,
         },
