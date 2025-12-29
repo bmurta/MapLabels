@@ -6,7 +6,7 @@ local activeLabels = {}
 
 -- Configuration
 CityGuideConfig = CityGuideConfig or {}
-CityGuideConfig.displayMode = CityGuideConfig.displayMode or "labels"
+CityGuideConfig.displayMode = CityGuideConfig.displayMode or "smallboth"
 CityGuideConfig.filterByProfession = CityGuideConfig.filterByProfession or false
 CityGuideConfig.labelSize = CityGuideConfig.labelSize or 1.0
 CityGuideConfig.iconSize = CityGuideConfig.iconSize or 1.0
@@ -17,7 +17,9 @@ CityGuideConfig.condenseProfessions = CityGuideConfig.condenseProfessions or {}
 CityGuideConfig.showFactionPOIs = CityGuideConfig.showFactionPOIs or false
 CityGuideConfig.factionPOIsOnly = CityGuideConfig.factionPOIsOnly or {}
 CityGuideConfig.showDecorPOIs = CityGuideConfig.showDecorPOIs ~= false -- Default to true
-CityGuideConfig.useTooltips = CityGuideConfig.useTooltips or false -- Default to false
+if CityGuideConfig.useTooltips == nil then
+    CityGuideConfig.useTooltips = true -- Default to true for new users
+end
 
 -- Function to clear old labels
 local function ClearLabels()

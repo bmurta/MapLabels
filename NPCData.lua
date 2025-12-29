@@ -434,7 +434,7 @@ CityGuideNPCData = {
         {
             x = 67.41 / 100, 
             y = 33.64 / 100, 
-            name = "Horde Decor", 
+            name = "Decor (Horde)", 
             icon = "Interface\\Housing\\inv_12ph_genericfixture",
             minimapIcon = MINIMAP_ICONS.DECOR,
             faction = "Horde"
@@ -960,8 +960,8 @@ CityGuideNPCData = {
         color = "00FF00"
     },
     {
-        x = 40.03 / 100, 
-        y = 52.83 / 100, 
+        x = 43.53 / 100, 
+        y = 54.01 / 100, 
         name = "Engi", 
         icon = "Interface\\Icons\\Trade_Engineering", 
         minimapIcon = MINIMAP_ICONS.PROF_TRAINER,
