@@ -117,6 +117,16 @@ CityGuideNPCData = {
             textDirection = "right",
             labelDistance = 1.3
         },
+        {
+            x = 74.50/ 100, 
+            y = 18.26 / 100, 
+            name = "Cata Portals", 
+            icon = "Interface\\Housing\\Spell_Arcane_PortalStormWind",
+            minimapIcon = MINIMAP_ICONS.PORTAL_MYTHIC,
+            noCluster = true,
+            textDirection = "right",
+            labelDistance = 1.3
+        },
     },
     [85] = { -- Orgrimmar
         {

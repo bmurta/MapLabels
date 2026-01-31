@@ -20,6 +20,8 @@ CityGuideConfig.showDecorPOIs = CityGuideConfig.showDecorPOIs ~= false -- Defaul
 if CityGuideConfig.useTooltips == nil then
     CityGuideConfig.useTooltips = true -- Default to true for new users
 end
+-- Default to enabled - only disable if explicitly set to false
+CityGuideConfig.showMapWidget = CityGuideConfig.showMapWidget ~= false
 
 -- Function to clear old labels
 local function ClearLabels()
@@ -79,9 +81,13 @@ function CityGuide_UpdateMapLabels()
         return
     end
 
-    -- Only show button if we have data for this map
+    -- Only show button if we have data for this map AND showMapWidget is enabled
     if mapID and CityGuideNPCData[mapID] then
-        CityGuide_CreateOrUpdateMapButton()
+        if CityGuideConfig.showMapWidget then
+            CityGuide_CreateOrUpdateMapButton()
+        else
+            CityGuide_HideMapButton()
+        end
     else
         CityGuide_HideMapButton()
         return

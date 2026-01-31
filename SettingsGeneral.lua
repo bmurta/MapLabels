@@ -33,9 +33,61 @@ function CityGuideSettings_LoadGeneralSection()
     generalTitle:SetText("General Settings")
     generalTitle:SetTextColor(1, 0.9, 0.5)
     
+    -- Show Map Widget Container
+    local widgetContainer = CreateFrame("Frame", nil, generalSection, "BackdropTemplate")
+    widgetContainer:SetSize(380, 100)
+    widgetContainer:SetPoint("TOPLEFT", titleContainer, "BOTTOMLEFT", 0, -20)
+    widgetContainer:SetBackdrop({
+        bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = true, tileSize = 16, edgeSize = 8,
+        insets = { left = 3, right = 3, top = 3, bottom = 3 }
+    })
+    widgetContainer:SetBackdropColor(0, 0, 0, 0.4)
+    widgetContainer:SetBackdropBorderColor(0.4, 0.4, 0.4, 0.8)
+    
+    local widgetTitle = widgetContainer:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    widgetTitle:SetPoint("TOPLEFT", widgetContainer, "TOPLEFT", 15, -15)
+    widgetTitle:SetText("Map Widget")
+    widgetTitle:SetTextColor(0.8, 0.9, 1)
+    
+    local showMapWidgetCheck = CreateFrame("CheckButton", nil, widgetContainer, "UICheckButtonTemplate")
+    showMapWidgetCheck:SetPoint("TOPLEFT", widgetTitle, "BOTTOMLEFT", 0, -10)
+    
+    local showMapWidgetLabel = showMapWidgetCheck:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    showMapWidgetLabel:SetPoint("LEFT", showMapWidgetCheck, "RIGHT", 5, 0)
+    showMapWidgetLabel:SetText("Show world map widget buttons")
+    
+    showMapWidgetCheck:SetScript("OnClick", function(self)
+        CityGuideConfig.showMapWidget = self:GetChecked()
+        CityGuide_UpdateMapLabels()
+        
+        if CityGuideConfig.showMapWidget then
+            print("|cff00ff00City Guide:|r Map widget enabled")
+        else
+            print("|cff00ff00City Guide:|r Map widget disabled")
+        end
+    end)
+    
+    showMapWidgetCheck:SetScript("OnEnter", function(self)
+        showMapWidgetLabel:SetTextColor(1, 1, 0.5)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText("Show World Map Widget")
+        GameTooltip:AddLine("When enabled, shows the City Guide buttons on the world map", 1, 1, 1, true)
+        GameTooltip:AddLine(" ", 1, 1, 1)
+        GameTooltip:AddLine("When disabled: Hides all City Guide buttons from the world map", 0.6, 0.6, 0.6, true)
+        GameTooltip:AddLine("Note: Labels and icons will still appear on the map", 0.8, 0.8, 0.8, true)
+        GameTooltip:Show()
+    end)
+    
+    showMapWidgetCheck:SetScript("OnLeave", function(self)
+        showMapWidgetLabel:SetTextColor(1, 1, 1)
+        GameTooltip:Hide()
+    end)
+    
     -- Enabled Cities
     local citiesTitle = generalSection:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-    citiesTitle:SetPoint("TOPLEFT", titleContainer, "BOTTOMLEFT", 0, -20)
+    citiesTitle:SetPoint("TOPLEFT", widgetContainer, "BOTTOMLEFT", 0, -20)
     citiesTitle:SetText("Enabled Cities")
     citiesTitle:SetTextColor(0.8, 0.9, 1)
     
@@ -45,7 +97,7 @@ function CityGuideSettings_LoadGeneralSection()
     citiesDesc:SetTextColor(0.7, 0.7, 0.7)
     
     local cityCheckboxes = {}
-    local cityYOffset = -115
+    local cityYOffset = -255 -- Adjusted for the new widget container
     local cityOrder = CityGuide_GetCityOrder()
     local mapNames = CityGuide_GetCityNames()
     
@@ -81,12 +133,19 @@ function CityGuideSettings_LoadGeneralSection()
     
     -- Store references for updates
     generalSection.cityCheckboxes = cityCheckboxes
+    generalSection.showMapWidgetCheck = showMapWidgetCheck
 end
 
 function CityGuideSettings_UpdateGeneralSection()
     local section = CityGuideSettings.contentSections["general"]
     if not section then return end
     
+    -- Update map widget checkbox
+    if section.showMapWidgetCheck then
+        section.showMapWidgetCheck:SetChecked(CityGuideConfig.showMapWidget)
+    end
+    
+    -- Update city checkboxes
     CityGuideConfig.enabledCities = CityGuideConfig.enabledCities or {}
     
     for mapID, checkbox in pairs(section.cityCheckboxes) do

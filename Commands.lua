@@ -226,6 +226,14 @@ local function HandleSlashCommand(msg)
             print("|cff00ff00City Guide:|r Decor POIs disabled")
         end
         CityGuide_UpdateMapLabels()
+    elseif cmd == "widget" then
+        CityGuideConfig.showMapWidget = not CityGuideConfig.showMapWidget
+        if CityGuideConfig.showMapWidget then
+            print("|cff00ff00City Guide:|r Map widget enabled")
+        else
+            print("|cff00ff00City Guide:|r Map widget disabled")
+        end
+        CityGuide_UpdateMapLabels()
     elseif cmd == "labelsize" then
         local size = tonumber(arg)
         if size and size >= 0.5 and size <= 2.0 then
@@ -278,6 +286,7 @@ local function HandleSlashCommand(msg)
         print("/cg toggle - Cycle through modes")
         print("/cg prof - Toggle profession filter")
         print("/cg decor - Toggle decor POIs")
+        print("/cg widget - Toggle map widget buttons")
         print("/cg labelsize <0.5-2.0> - Set label size")
         print("/cg iconsize <0.5-2.0> - Set icon size")
         print("/cg resetsize - Reset sizes to default")
