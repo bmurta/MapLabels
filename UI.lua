@@ -122,6 +122,7 @@ function CityGuide_CreateIconOnly(parent, x, y, iconPath, minimapIcon, scale, si
         local glow = container:CreateTexture(nil, "BACKGROUND")
         glow:SetSize(iconSize * 2.4, iconSize * 2.4)
         glow:SetPoint("CENTER")
+        
         -- Using a simple white texture with radial gradient effect
         glow:SetTexture("Interface\\GLUES\\Models\\UI_Draenei\\GenericGlow64")
         glow:SetVertexColor(1, 1, 0.8, 0.5) -- Warm white, 50% opacity
@@ -308,6 +309,33 @@ function CityGuide_CreateOrUpdateMapButton()
                     GameTooltip:Hide()
                     self:GetScript("OnEnter")(self)
                 end
+            elseif button == "MiddleButton" then
+                -- FEATURE 2: Middle-click to toggle current city enabled/disabled
+                local mapID = WorldMapFrame:GetMapID()
+                if mapID then
+                    CityGuideConfig.enabledCities = CityGuideConfig.enabledCities or {}
+                    
+                    -- Get current state (nil means enabled by default)
+                    local currentState = CityGuideConfig.enabledCities[mapID]
+                    if currentState == nil then
+                        currentState = true
+                    end
+                    
+                    -- Toggle the state
+                    CityGuideConfig.enabledCities[mapID] = not currentState
+                    
+                    -- Update the map labels
+                    CityGuide_UpdateMapLabels()
+                    
+                    -- Print confirmation message
+                    local mapNames = CityGuide_GetCityNames()
+                    local cityName = mapNames[mapID] or "Unknown City"
+                    if CityGuideConfig.enabledCities[mapID] == false then
+                        print("|cff00ff00City Guide:|r " .. cityName .. " disabled")
+                    else
+                        print("|cff00ff00City Guide:|r " .. cityName .. " enabled")
+                    end
+                end
             else
                 -- Left-click: Cycle through modes based on tooltip state
                 if CityGuideConfig.useTooltips then
@@ -364,41 +392,61 @@ function CityGuide_CreateOrUpdateMapButton()
             end
         end)
         
-        -- Register for right-click
-        mapButton:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+        -- Register for left-click, right-click, and middle-click
+        mapButton:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp")
         
         mapButton:SetScript("OnEnter", function(self)
             self.icon:SetVertexColor(1, 1, 0.5)
             
-            -- Determine mode name based on current settings
-            local modeName
-            if CityGuideConfig.useTooltips then
-                -- Tooltip mode - only 3 modes available
-                modeName = CityGuideConfig.displayMode == "labels" and "Labels Only" or
-                          CityGuideConfig.displayMode == "both" and "Icons with Tooltips" or
-                          "Small Icons with Tooltips"
-            else
-                -- Legacy mode - all 5 modes available
-                modeName = CityGuideConfig.displayMode == "labels" and "Labels Only" or
-                          CityGuideConfig.displayMode == "icons" and "Icons Only" or
-                          CityGuideConfig.displayMode == "both" and "Icons with Labels" or
-                          CityGuideConfig.displayMode == "smallicons" and "Small Icons" or
-                          "Small Icons with Labels"
-            end
+            -- Check if current city is disabled
+            local mapID = WorldMapFrame:GetMapID()
+            local isCityDisabled = mapID and (CityGuideConfig.enabledCities[mapID] == false)
             
-            GameTooltip:SetOwner(self, "ANCHOR_LEFT")
-            GameTooltip:SetText("City Guide Display")
-            GameTooltip:AddLine("Current: |cff00ff00" .. modeName .. "|r", 1, 1, 1)
-            GameTooltip:AddLine(" ", 1, 1, 1)
-            
-            if CityGuideConfig.useTooltips then
-                GameTooltip:AddLine("|cffFFD700Tooltip Mode:|r ON", 0.5, 1, 0.5)
-                GameTooltip:AddLine("Left-click: Cycle (3 modes)", 0.8, 0.8, 0.8)
-                GameTooltip:AddLine("Right-click: Switch to Text Mode", 0.8, 0.8, 0.8)
+            if isCityDisabled then
+                -- Special tooltip when city is disabled
+                GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+                GameTooltip:SetText("City Guide - City Disabled")
+                
+                local mapNames = CityGuide_GetCityNames()
+                local cityName = mapNames[mapID] or "This city"
+                GameTooltip:AddLine(cityName .. " is currently disabled", 1, 0.5, 0.5)
+                GameTooltip:AddLine(" ", 1, 1, 1)
+                GameTooltip:AddLine("|cffFFD700Middle-click:|r Enable this city", 1, 1, 0.5)
             else
-                GameTooltip:AddLine("|cffFFD700Text Mode:|r ON", 0.8, 0.8, 0.8)
-                GameTooltip:AddLine("Left-click: Cycle (5 modes)", 0.8, 0.8, 0.8)
-                GameTooltip:AddLine("Right-click: Switch to Tooltip Mode", 0.8, 0.8, 0.8)
+                -- Normal tooltip when city is enabled
+                -- Determine mode name based on current settings
+                local modeName
+                if CityGuideConfig.useTooltips then
+                    -- Tooltip mode - only 3 modes available
+                    modeName = CityGuideConfig.displayMode == "labels" and "Labels Only" or
+                              CityGuideConfig.displayMode == "both" and "Icons with Tooltips" or
+                              "Small Icons with Tooltips"
+                else
+                    -- Legacy mode - all 5 modes available
+                    modeName = CityGuideConfig.displayMode == "labels" and "Labels Only" or
+                              CityGuideConfig.displayMode == "icons" and "Icons Only" or
+                              CityGuideConfig.displayMode == "both" and "Icons with Labels" or
+                              CityGuideConfig.displayMode == "smallicons" and "Small Icons" or
+                              "Small Icons with Labels"
+                end
+                
+                GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+                GameTooltip:SetText("City Guide Display")
+                GameTooltip:AddLine("Current: |cff00ff00" .. modeName .. "|r", 1, 1, 1)
+                GameTooltip:AddLine(" ", 1, 1, 1)
+                
+                if CityGuideConfig.useTooltips then
+                    GameTooltip:AddLine("|cffFFD700Tooltip Mode:|r ON", 0.5, 1, 0.5)
+                    GameTooltip:AddLine("Left-click: Cycle (3 modes)", 0.8, 0.8, 0.8)
+                    GameTooltip:AddLine("Right-click: Switch to Text Mode", 0.8, 0.8, 0.8)
+                else
+                    GameTooltip:AddLine("|cffFFD700Text Mode:|r ON", 0.8, 0.8, 0.8)
+                    GameTooltip:AddLine("Left-click: Cycle (5 modes)", 0.8, 0.8, 0.8)
+                    GameTooltip:AddLine("Right-click: Switch to Tooltip Mode", 0.8, 0.8, 0.8)
+                end
+                
+                GameTooltip:AddLine(" ", 1, 1, 1)
+                GameTooltip:AddLine("|cffFFD700Middle-click:|r Disable this city", 1, 1, 0.5)
             end
             
             GameTooltip:Show()
@@ -413,8 +461,17 @@ function CityGuide_CreateOrUpdateMapButton()
     -- Update checkbox state
     profFilterButton:SetChecked(CityGuideConfig.filterByProfession)
     
-    -- Update mode icon
-    mapButton.icon:SetTexture(modeIcons[CityGuideConfig.displayMode] or modeIcons["labels"])
+    -- Update mode icon - show X if current city is disabled
+    local mapID = WorldMapFrame:GetMapID()
+    local isCityDisabled = mapID and (CityGuideConfig.enabledCities[mapID] == false)
+    
+    if isCityDisabled then
+        -- Show X icon when city is disabled
+        mapButton.icon:SetTexture("Interface\\RaidFrame\\ReadyCheck-NotReady")
+    else
+        -- Show normal mode icon when city is enabled
+        mapButton.icon:SetTexture(modeIcons[CityGuideConfig.displayMode] or modeIcons["labels"])
+    end
     
     -- Update border glow based on mode - MUCH MORE VISIBLE
     if CityGuideConfig.useTooltips then

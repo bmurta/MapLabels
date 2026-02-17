@@ -75,13 +75,8 @@ function CityGuide_UpdateMapLabels()
         return
     end
 
-    -- Check if this city is enabled (default to enabled if not in config)
-    if CityGuideConfig.enabledCities[mapID] == false then
-        CityGuide_HideMapButton()
-        return
-    end
-
-    -- Only show button if we have data for this map AND showMapWidget is enabled
+    -- FEATURE 1: Show/hide widget based on showMapWidget setting (before city check)
+    -- Widget stays visible even when city is disabled
     if mapID and CityGuideNPCData[mapID] then
         if CityGuideConfig.showMapWidget then
             CityGuide_CreateOrUpdateMapButton()
@@ -90,6 +85,15 @@ function CityGuide_UpdateMapLabels()
         end
     else
         CityGuide_HideMapButton()
+    end
+
+    -- Check if this city is enabled (now only affects labels, not widget)
+    if CityGuideConfig.enabledCities[mapID] == false then
+        return
+    end
+
+    -- If we don't have data for this map, return
+    if not (mapID and CityGuideNPCData[mapID]) then
         return
     end
 

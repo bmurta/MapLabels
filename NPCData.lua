@@ -121,7 +121,7 @@ CityGuideNPCData = {
             x = 74.50/ 100, 
             y = 18.26 / 100, 
             name = "Cata Portals", 
-            icon = "Interface\\Housing\\Spell_Arcane_PortalStormWind",
+            icon = "Interface\\Icons\\Spell_Arcane_PortalStormWind",
             minimapIcon = MINIMAP_ICONS.PORTAL_MYTHIC,
             noCluster = true,
             textDirection = "right",
@@ -548,9 +548,17 @@ CityGuideNPCData = {
         {
             x = 26.04 / 100, 
             y = 40.82 / 100, 
-            name = "Badlands Portal", 
+            name = "Badlands\nPortal", 
             icon = "Interface\\Icons\\Spell_Arcane_PortalOrgrimmar", 
             minimapIcon = MINIMAP_ICONS.PORTAL_HORDE,
+            textDirection = "top"
+        },
+        {
+            x = 62.88 / 100, 
+            y = 57.47 / 100, 
+            name = "Dream\nPortal", 
+            icon = "Interface\\Icons\\inv_achievement_raidemeralddream_raid", 
+            minimapIcon = MINIMAP_ICONS.PORTAL_ALLY,
             textDirection = "top"
         },
         {
