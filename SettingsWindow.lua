@@ -243,9 +243,15 @@ function CityGuide_CreateStandaloneSettingsWindow()
     end
     
     -- Footer: donation link at bottom of nav panel
+    -- Version label
+    local versionText = navPanel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    versionText:SetPoint("BOTTOM", navPanel, "BOTTOM", 0, 2)
+    versionText:SetText("|cff444444v" .. (C_AddOns.GetAddOnMetadata("CityGuide", "Version") or "?") .. "|r")
+
+    -- Donation button
     local footerBtn = CreateFrame("Button", nil, navPanel)
-    footerBtn:SetSize(130, 30)
-    footerBtn:SetPoint("BOTTOM", navPanel, "BOTTOM", 0, -30)
+    footerBtn:SetSize(130, 20)
+    footerBtn:SetPoint("BOTTOM", navPanel, "BOTTOM", 0, -18)
 
     local footerText = footerBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     footerText:SetPoint("CENTER", footerBtn, "CENTER", 0, 0)
