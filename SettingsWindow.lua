@@ -242,6 +242,45 @@ function CityGuide_CreateStandaloneSettingsWindow()
         yOffset = yOffset - 38
     end
     
+    -- Footer: donation link at bottom of nav panel
+    local footerBtn = CreateFrame("Button", nil, navPanel)
+    footerBtn:SetSize(130, 30)
+    footerBtn:SetPoint("BOTTOM", navPanel, "BOTTOM", 0, -30)
+
+    local footerText = footerBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    footerText:SetPoint("CENTER", footerBtn, "CENTER", 0, 0)
+    footerText:SetText("|cff555555Buy me a coffee|r")
+
+    footerBtn:SetScript("OnClick", function()
+        if not StaticPopupDialogs["CITYGUIDE_DONATE"] then
+            StaticPopupDialogs["CITYGUIDE_DONATE"] = {
+                text = "Enjoying City Guide? Support development:",
+                button1 = "Close",
+                hasEditBox = true,
+                editBoxWidth = 260,
+                OnShow = function(self)
+                    self.EditBox:SetText("https://buymeacoffee.com/valash")
+                    self.EditBox:SetFocus()
+                    self.EditBox:HighlightText()
+                end,
+                OnAccept = function() end,
+                timeout = 0,
+                whileDead = true,
+                hideOnEscape = true,
+                preferredIndex = 3,
+            }
+        end
+        StaticPopup_Show("CITYGUIDE_DONATE")
+    end)
+
+    footerBtn:SetScript("OnEnter", function()
+        footerText:SetText("|cffa0a0a0 Buy me a coffee|r")
+    end)
+
+    footerBtn:SetScript("OnLeave", function()
+        footerText:SetText("|cff555555 Buy me a coffee|r")
+    end)
+
     -- Load sections using existing functions but with our scroll child
     local originalScrollChild = CityGuideSettings.scrollChild
     local originalContentSections = CityGuideSettings.contentSections
