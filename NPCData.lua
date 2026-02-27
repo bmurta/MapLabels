@@ -22,7 +22,8 @@ local MINIMAP_ICONS = {
     PVP_OLD = "Interface\\Minimap\\Tracking\\battlemaster",
     GOLD_HAMMER = "Interface\\Minimap\\trapinactive_hammergold",
     WORK_ORDERS = "Interface\\Cursor\\Crosshair\\workorders",
-   
+    COMET = "Interface\\Cursor\\Crosshair\\bastionteleporter",
+    ARGUS = "Interface\\Cursor\\Crosshair\\argusteleporter",
     
     -- Trainers
     CLASS_TRAINER = "Interface\\Minimap\\Tracking\\Class",
@@ -825,7 +826,7 @@ CityGuideNPCData = {
         y = 81.11 / 100, 
         name = "PvP", 
         icon = "Interface\\Icons\\achievement_legionpvp2tier3", 
-        minimapIcon = MINIMAP_ICONS.PVP,
+        minimapIcon = MINIMAP_ICONS.PVP_OLD,
         color = "FF2020",
         labelDistance = 1.8
     },
@@ -834,8 +835,25 @@ CityGuideNPCData = {
         y = 85.65 / 100, 
         name = "Dummy", 
         icon = "Interface\\Icons\\Ability_rogue_combatexpertise", 
-        minimapIcon = MINIMAP_ICONS.PVP_OLD,
+        minimapIcon = MINIMAP_ICONS.PVP,
         color = "FF2020",
+    },
+    {
+        x = 36.97 / 100,
+        y = 68.12 / 100,
+        name = "Harandar", 
+        icon = "Interface\\Icons\\inv_achievement_zone_harandar", 
+        minimapIcon = MINIMAP_ICONS.ARGUS,        
+    },
+    {
+        x = 35.28 / 100,
+        y = 65.70 / 100,
+        name = "Voidstorm", 
+        icon = "Interface\\Icons\\inv_zone_voidstorm", 
+        minimapIcon = MINIMAP_ICONS.COMET, 
+        noCluster = true, 
+        textDirection = "left", 
+        labelDistance = 1.5
     },
 
     -- Horde Only
