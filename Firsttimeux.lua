@@ -124,7 +124,7 @@ local function UpdateTutorialText()
     local rightColor = rightDone and "ffaaaaaa" or "ffffffff"
     local midColor   = midDone   and "ffaaaaaa" or "ffffffff"
 
-    tutorialFrame.rightText:SetText((rightDone and readyTex or waitingTex) .. "|c" .. rightColor .. "Right-click the mode icon to change display mode|r")
+    tutorialFrame.rightText:SetText((rightDone and readyTex or waitingTex) .. "|c" .. rightColor .. "Right-click the mode icon to change mode|r")
     tutorialFrame.midText:SetText(  (midDone   and readyTex or waitingTex) .. "|c" .. midColor   .. "Middle-click to enable/disable in this city|r")
 end
 
