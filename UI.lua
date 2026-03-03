@@ -284,6 +284,7 @@ function CityGuide_CreateOrUpdateMapButton()
         
         mapButton:SetScript("OnClick", function(self, button)
             if button == "RightButton" then
+                CityGuide_OnTutorialRightClick()   -- First-time UX tracking
                 -- Right-click: Toggle tooltip mode ON/OFF
                 CityGuideConfig.useTooltips = not CityGuideConfig.useTooltips
                 
@@ -310,6 +311,7 @@ function CityGuide_CreateOrUpdateMapButton()
                     self:GetScript("OnEnter")(self)
                 end
             elseif button == "MiddleButton" then
+                CityGuide_OnTutorialMiddleClick()   -- First-time UX tracking
                 -- FEATURE 2: Middle-click to toggle current city enabled/disabled
                 local mapID = WorldMapFrame:GetMapID()
                 if mapID then
@@ -396,47 +398,20 @@ function CityGuide_CreateOrUpdateMapButton()
         mapButton:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp")
         
         mapButton:SetScript("OnEnter", function(self)
-            self.icon:SetVertexColor(1, 1, 0.5)
+            self.icon:SetVertexColor(1, 1, 0.7)
+            GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+            GameTooltip:SetText("City Guide Display Mode")
             
-            -- Check if current city is disabled
+            -- Show current mode
             local mapID = WorldMapFrame:GetMapID()
             local isCityDisabled = mapID and (CityGuideConfig.enabledCities[mapID] == false)
             
             if isCityDisabled then
-                -- Special tooltip when city is disabled
-                GameTooltip:SetOwner(self, "ANCHOR_LEFT")
-                GameTooltip:SetText("City Guide - City Disabled")
-                
-                local mapNames = CityGuide_GetCityNames()
-                local cityName = mapNames[mapID] or "This city"
-                GameTooltip:AddLine(cityName .. " is currently disabled", 1, 0.5, 0.5)
-                GameTooltip:AddLine(" ", 1, 1, 1)
-                GameTooltip:AddLine("|cffFFD700Middle-click:|r Enable this city", 1, 1, 0.5)
+                GameTooltip:AddLine("|cffFF4444City Disabled|r", 1, 1, 1)
+                GameTooltip:AddLine("Middle-click to re-enable this city", 0.8, 0.8, 0.8)
             else
-                -- Normal tooltip when city is enabled
-                -- Determine mode name based on current settings
-                local modeName
                 if CityGuideConfig.useTooltips then
-                    -- Tooltip mode - only 3 modes available
-                    modeName = CityGuideConfig.displayMode == "labels" and "Labels Only" or
-                              CityGuideConfig.displayMode == "both" and "Icons with Tooltips" or
-                              "Small Icons with Tooltips"
-                else
-                    -- Legacy mode - all 5 modes available
-                    modeName = CityGuideConfig.displayMode == "labels" and "Labels Only" or
-                              CityGuideConfig.displayMode == "icons" and "Icons Only" or
-                              CityGuideConfig.displayMode == "both" and "Icons with Labels" or
-                              CityGuideConfig.displayMode == "smallicons" and "Small Icons" or
-                              "Small Icons with Labels"
-                end
-                
-                GameTooltip:SetOwner(self, "ANCHOR_LEFT")
-                GameTooltip:SetText("City Guide Display")
-                GameTooltip:AddLine("Current: |cff00ff00" .. modeName .. "|r", 1, 1, 1)
-                GameTooltip:AddLine(" ", 1, 1, 1)
-                
-                if CityGuideConfig.useTooltips then
-                    GameTooltip:AddLine("|cffFFD700Tooltip Mode:|r ON", 0.5, 1, 0.5)
+                    GameTooltip:AddLine("|cffFFD700Tooltip Mode:|r ON", 0.8, 0.8, 0.8)
                     GameTooltip:AddLine("Left-click: Cycle (3 modes)", 0.8, 0.8, 0.8)
                     GameTooltip:AddLine("Right-click: Switch to Text Mode", 0.8, 0.8, 0.8)
                 else
@@ -489,7 +464,10 @@ function CityGuide_CreateOrUpdateMapButton()
         buttonContainer.flashAnim:Stop()
         buttonContainer.flashAnim:Play()
     end
-    
+
+    -- First-time UX tutorial
+    CityGuide_TryShowTutorial()
+
     buttonContainer:Show()
 end
 
@@ -498,6 +476,7 @@ function CityGuide_HideMapButton()
     if buttonContainer then
         buttonContainer:Hide()
     end
+    CityGuide_HideTutorial()
 end
 
 -- Function to hide profession filter button (kept for compatibility)

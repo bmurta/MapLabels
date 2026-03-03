@@ -855,6 +855,15 @@ CityGuideNPCData = {
         textDirection = "left", 
         labelDistance = 1.5
     },
+    {
+        x = 51.06 / 100,
+        y = 56.49 / 100,
+        name = "Decor", 
+        icon = "Interface\\Housing\\inv_12ph_genericfixture",
+        minimapIcon = MINIMAP_ICONS.DECOR,
+        noCluster = true, 
+        textDirection = "top", 
+    },
 
     -- Horde Only
         {

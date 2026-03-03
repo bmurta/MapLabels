@@ -101,7 +101,7 @@ local function HandleCoordsOnly()
 
         CityGuideCoordsFrame.title = CityGuideCoordsFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
         CityGuideCoordsFrame.title:SetPoint("TOP", 0, -5)
-        CityGuideCoordsFrame.title:SetText("Copy Coordinates (Ctrl+A, Ctrl+C)")
+        CityGuideCoordsFrame.title:SetText("Copy Map ID (Ctrl+A, Ctrl+C)")
 
         local scrollFrame = CreateFrame("ScrollFrame", nil, CityGuideCoordsFrame, "UIPanelScrollFrameTemplate")
         scrollFrame:SetPoint("TOPLEFT", 10, -30)
@@ -110,7 +110,7 @@ local function HandleCoordsOnly()
         local editBox = CreateFrame("EditBox", nil, scrollFrame)
         editBox:SetMultiLine(true)
         editBox:SetFontObject(ChatFontNormal)
-        editBox:SetWidth(350)
+        editBox:SetWidth(250)
         editBox:SetAutoFocus(false)
         editBox:SetScript("OnEscapePressed", function()
             CityGuideCoordsFrame:Hide()
@@ -125,20 +125,12 @@ local function HandleCoordsOnly()
     CityGuideCoordsFrame:Show()
 end
 
--- Function to get current zone/map ID
 local function HandleZoneID()
     local mapID = C_Map.GetBestMapForUnit("player")
-    if not mapID then
-        print("|cffff0000Error:|r Could not get map ID")
-        return
-    end
-    
-    local mapInfo = C_Map.GetMapInfo(mapID)
-    if mapInfo then
-        print("|cff00ff00Current Zone Info:|r")
-        print("Map ID: |cffffffff" .. mapID .. "|r")
-        print("Map Name: |cffffffff" .. mapInfo.name .. "|r")
-        
+    if mapID then
+        local mapInfo = C_Map.GetMapInfo(mapID)
+        local mapName = mapInfo and mapInfo.name or "Unknown"
+
         if not CityGuideZoneIDFrame then
             CityGuideZoneIDFrame = CreateFrame("Frame", "CityGuideZoneIDFrame", UIParent, "BasicFrameTemplateWithInset")
             CityGuideZoneIDFrame:SetSize(300, 100)
@@ -234,6 +226,8 @@ local function HandleSlashCommand(msg)
             print("|cff00ff00City Guide:|r Map widget disabled")
         end
         CityGuide_UpdateMapLabels()
+    elseif cmd == "tutorial" then
+        CityGuide_ResetTutorial()
     elseif cmd == "labelsize" then
         local size = tonumber(arg)
         if size and size >= 0.5 and size <= 2.0 then
@@ -271,7 +265,7 @@ local function HandleSlashCommand(msg)
             end
             CaptureCoordinates(npcName, iconPath)
         else
-            print("|cffaaaaaa Usage: /cg capture <name> [, icon path]")
+            print("|cffaaaaaa Usage: /cg capture <n> [, icon path]")
         end
     elseif cmd == "coords" then
         HandleCoordsOnly()

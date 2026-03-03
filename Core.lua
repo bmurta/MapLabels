@@ -23,6 +23,11 @@ end
 -- Default to enabled - only disable if explicitly set to false
 CityGuideConfig.showMapWidget = CityGuideConfig.showMapWidget ~= false
 
+-- First-time UX tutorial tracking
+CityGuideConfig.tutorialSeen          = CityGuideConfig.tutorialSeen          or false
+CityGuideConfig.tutorialRightClicked  = CityGuideConfig.tutorialRightClicked  or false
+CityGuideConfig.tutorialMiddleClicked = CityGuideConfig.tutorialMiddleClicked or false
+
 -- Function to clear old labels
 local function ClearLabels()
     for i, label in ipairs(activeLabels) do
