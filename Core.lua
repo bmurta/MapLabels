@@ -22,6 +22,8 @@ if CityGuideConfig.useTooltips == nil then
 end
 -- Default to enabled - only disable if explicitly set to false
 CityGuideConfig.showMapWidget = CityGuideConfig.showMapWidget ~= false
+-- Label/icon strata priority: "under" (below quests), "normal", "top" (always on top)
+CityGuideConfig.labelPriority = CityGuideConfig.labelPriority or "normal"
 
 -- First-time UX tutorial tracking
 CityGuideConfig.tutorialSeen          = CityGuideConfig.tutorialSeen          or false

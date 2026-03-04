@@ -24,6 +24,7 @@ function CityGuide_CreateStandaloneSettingsWindow()
     window:SetScript("OnDragStart", window.StartMoving)
     window:SetScript("OnDragStop", window.StopMovingOrSizing)
     window:SetClampedToScreen(true)
+    window:SetFrameStrata("DIALOG")
     
     -- The template already has a background, just color it black
     if window.Bg then

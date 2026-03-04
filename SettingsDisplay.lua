@@ -6,7 +6,7 @@ function CityGuideSettings_LoadDisplaySection()
     local displaySection = CreateFrame("Frame", nil, scrollChild)
     displaySection:SetPoint("TOPLEFT", 20, -20)
     displaySection:SetPoint("TOPRIGHT", -20, -20)
-    displaySection:SetHeight(600)
+    displaySection:SetHeight(760)  -- Increased from 600 to fit Label Priority section
     CityGuideSettings.contentSections["display"] = displaySection
     
     -- Section title
@@ -31,11 +31,103 @@ function CityGuideSettings_LoadDisplaySection()
     displayTitle:SetPoint("LEFT", titleIcon, "RIGHT", 10, 0)
     displayTitle:SetText("Display Modes")
     displayTitle:SetTextColor(1, 0.9, 0.5)
-    
+
+    -- ── Label Priority ────────────────────────────────────────────────────────
+    -- Controls frame strata of map labels/icons relative to quest pins.
+
+    local priorityTitle = displaySection:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    priorityTitle:SetPoint("TOPLEFT", titleContainer, "BOTTOMLEFT", 0, -20)
+    priorityTitle:SetText("Frame Strata:")
+    priorityTitle:SetTextColor(0.8, 0.9, 1)
+
+    local priorityDesc = displaySection:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+    priorityDesc:SetPoint("TOPLEFT", priorityTitle, "BOTTOMLEFT", 0, -4)
+    priorityDesc:SetText("Sets the frame strata of labels/icons. Use 'Medium' if city guide overlaps quest or campaign pins.")
+    priorityDesc:SetTextColor(0.6, 0.6, 0.6)
+    priorityDesc:SetWidth(355)
+    priorityDesc:SetJustifyH("LEFT")
+
+    local priorityContainer = CreateFrame("Frame", nil, displaySection)
+    priorityContainer:SetPoint("TOPLEFT", priorityDesc, "BOTTOMLEFT", 0, -10)
+    priorityContainer:SetSize(355, 55)
+
+    local priorityOptions = {
+        { key = "under",  text = "Medium",  desc = "Below quest pins" },
+        { key = "normal", text = "Normal",         desc = "(default)" },
+        { key = "top",    text = "Always On Top"},
+    }
+
+    local priorityButtons = {}
+    local btnWidth = 115
+    local btnGap = 5
+
+    for i, opt in ipairs(priorityOptions) do
+        local btn = CreateFrame("Button", nil, priorityContainer, "BackdropTemplate")
+        btn:SetSize(btnWidth, 50)
+        btn:SetPoint("TOPLEFT", priorityContainer, "TOPLEFT", (i - 1) * (btnWidth + btnGap), 0)
+        btn:SetBackdrop({
+            bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
+            edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+            tile = true, tileSize = 16, edgeSize = 8,
+            insets = { left = 3, right = 3, top = 3, bottom = 3 }
+        })
+
+        local isSelected = (CityGuideConfig.labelPriority or "normal") == opt.key
+        if isSelected then
+            btn:SetBackdropColor(0.2, 0.4, 0.2, 1)
+            btn:SetBackdropBorderColor(0.3, 0.8, 0.3, 1)
+        else
+            btn:SetBackdropColor(0, 0, 0, 0.4)
+            btn:SetBackdropBorderColor(0.4, 0.4, 0.4, 0.8)
+        end
+
+        local btnTitle = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        btnTitle:SetPoint("TOP", btn, "TOP", 0, -10)
+        btnTitle:SetText(opt.text)
+        btnTitle:SetTextColor(isSelected and 0.5 or 1, 1, isSelected and 0.5 or 1)
+        btnTitle:SetJustifyH("CENTER")
+
+        local btnDesc = btn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        btnDesc:SetPoint("TOP", btnTitle, "BOTTOM", 0, -3)
+        btnDesc:SetText(opt.desc)
+        btnDesc:SetTextColor(0.6, 0.6, 0.6)
+        btnDesc:SetWidth(btnWidth - 10)
+        btnDesc:SetJustifyH("CENTER")
+
+        btn.optKey   = opt.key
+        btn.btnTitle = btnTitle
+        priorityButtons[i] = btn
+
+        btn:SetScript("OnClick", function(self)
+            CityGuideConfig.labelPriority = self.optKey
+            CityGuide_UpdateMapLabels()
+            print("|cff00ff00City Guide:|r Label strata priority set to " .. opt.text)
+            CityGuideSettings_UpdateDisplaySection()
+        end)
+
+        btn:SetScript("OnEnter", function(self)
+            if (CityGuideConfig.labelPriority or "normal") ~= self.optKey then
+                self:SetBackdropColor(0.1, 0.1, 0.1, 0.8)
+            end
+            self.btnTitle:SetTextColor(1, 1, 0.5)
+        end)
+
+        btn:SetScript("OnLeave", function(self)
+            if (CityGuideConfig.labelPriority or "normal") ~= self.optKey then
+                self:SetBackdropColor(0, 0, 0, 0.4)
+            end
+            local sel = (CityGuideConfig.labelPriority or "normal") == self.optKey
+            self.btnTitle:SetTextColor(sel and 0.5 or 1, 1, sel and 0.5 or 1)
+        end)
+    end
+
+    displaySection.priorityButtons = priorityButtons
+    -- ── End Label Priority ────────────────────────────────────────────────────
+
     -- Display System Toggle (Two horizontal buttons)
     local systemToggleContainer = CreateFrame("Frame", nil, displaySection, "BackdropTemplate")
     systemToggleContainer:SetSize(380, 100)
-    systemToggleContainer:SetPoint("TOPLEFT", titleContainer, "BOTTOMLEFT", 0, -20)
+    systemToggleContainer:SetPoint("TOPLEFT", priorityContainer, "BOTTOMLEFT", 0, -20)
     systemToggleContainer:SetBackdrop({
         bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -186,7 +278,7 @@ function CityGuideSettings_LoadDisplaySection()
                 print("|cff00ff00City Guide:|r " .. modeData.text)
                 RebuildModeButtons() -- Rebuild to update selection
             end)
-            
+
             btn:SetScript("OnEnter", function(self)
                 if CityGuideConfig.displayMode ~= modeData.mode then
                     self:SetBackdropColor(0.1, 0.1, 0.1, 0.8)
@@ -309,5 +401,21 @@ function CityGuideSettings_UpdateDisplaySection()
     -- Rebuild the mode buttons to show correct set
     if section.RebuildModeButtons then
         section.RebuildModeButtons()
+    end
+
+    -- Update label priority button highlights
+    if section.priorityButtons then
+        local current = CityGuideConfig.labelPriority or "normal"
+        for _, btn in ipairs(section.priorityButtons) do
+            if btn.optKey == current then
+                btn:SetBackdropColor(0.2, 0.4, 0.2, 1)
+                btn:SetBackdropBorderColor(0.3, 0.8, 0.3, 1)
+                btn.btnTitle:SetTextColor(0.5, 1, 0.5)
+            else
+                btn:SetBackdropColor(0, 0, 0, 0.4)
+                btn:SetBackdropBorderColor(0.4, 0.4, 0.4, 0.8)
+                btn.btnTitle:SetTextColor(1, 1, 1)
+            end
+        end
     end
 end

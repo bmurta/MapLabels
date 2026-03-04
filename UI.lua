@@ -14,6 +14,22 @@ local modeIcons = {
     smallboth = "Interface\\Cursor\\Crosshair\\workorders"        -- Small icons with labels
 }
 
+-- Returns the strata and frame level to use for map labels/icons.
+-- Controlled by CityGuideConfig.labelPriority:
+--   "under"  -> MEDIUM/100  (below quest pins - default)
+--   "normal" -> HIGH/100    (above most pins but not extreme)
+--   "top"    -> HIGH/9999   (always on top - original behaviour)
+local function GetLabelStrataAndLevel()
+    local p = CityGuideConfig.labelPriority or "under"
+    if p == "normal" then
+        return "HIGH", 100
+    elseif p == "top" then
+        return "HIGH", 9999
+    else -- "under"
+        return "MEDIUM", 100
+    end
+end
+
 -- Function to create a label (text only)
 function CityGuide_CreateTextLabel(parent, x, y, text, scale, textDirection, color, labelDistance, sizeMultiplier)
     scale = scale or 1.0
@@ -27,8 +43,9 @@ function CityGuide_CreateTextLabel(parent, x, y, text, scale, textDirection, col
     local container = CreateFrame("Frame", nil, parent)
     container:SetSize(200 * finalScale, 50 * finalScale) -- Increased height for multi-line
     
-    container:SetFrameStrata("HIGH")
-    container:SetFrameLevel(9999)
+    local strata, level = GetLabelStrataAndLevel()
+    container:SetFrameStrata(strata)
+    container:SetFrameLevel(level)
 
     -- Check if text contains line breaks
     local lines = {}
@@ -114,8 +131,9 @@ function CityGuide_CreateIconOnly(parent, x, y, iconPath, minimapIcon, scale, si
     local container = CreateFrame("Frame", nil, parent)
     container:SetSize(iconSize, iconSize)
 
-    container:SetFrameStrata("HIGH")
-    container:SetFrameLevel(9999)
+    local strata, level = GetLabelStrataAndLevel()
+    container:SetFrameStrata(strata)
+    container:SetFrameLevel(level)
     
     if useSmallIcons and minimapIcon then
         -- Create circular glow background for small icons

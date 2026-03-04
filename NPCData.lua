@@ -24,6 +24,7 @@ local MINIMAP_ICONS = {
     WORK_ORDERS = "Interface\\Cursor\\Crosshair\\workorders",
     COMET = "Interface\\Cursor\\Crosshair\\bastionteleporter",
     ARGUS = "Interface\\Cursor\\Crosshair\\argusteleporter",
+    COIN = "Interface\\Buttons\\ui-grouploot-coin-up",
     
     -- Trainers
     CLASS_TRAINER = "Interface\\Minimap\\Tracking\\Class",
@@ -48,6 +49,9 @@ local MINIMAP_ICONS = {
     CATALYST = "Interface\\AddOns\\CityGuide\\Icons\\catalyst",
     DECOR = "Interface\\AddOns\\CityGuide\\Icons\\decor",
     RENOWN = "Interface\\AddOns\\CityGuide\\Icons\\renown",
+    DELVES = "Interface\\AddOns\\CityGuide\\Icons\\delves",
+    TRADINGPOST = "Interface\\AddOns\\CityGuide\\Icons\\tp",
+    VENDOR = "Interface\\AddOns\\CityGuide\\Icons\\vendor",
 }
 
 -- IMPORTANT: Only define CityGuideNPCData ONCE!
@@ -149,7 +153,7 @@ CityGuideNPCData = {
         y = 76.04 / 100, 
         name = "TP", 
         icon = "Interface\\Icons\\Tradingpostcurrency", 
-        minimapIcon = "Interface\\Icons\\Tradingpostcurrency",
+        minimapIcon = MINIMAP_ICONS.TRADINGPOST,
         textDirection = "top",
         noCluster = true, 
         color = "99CCFF"
@@ -254,7 +258,7 @@ CityGuideNPCData = {
             y = 55.91 / 100, 
             name = "Trading\nPost", 
             icon = "Interface\\Icons\\Tradingpostcurrency", 
-            minimapIcon = "Interface\\Icons\\Tradingpostcurrency",
+            minimapIcon = MINIMAP_ICONS.TRADINGPOST,
             noCluster = true, 
             color = "99CCFF"
         },
@@ -772,6 +776,8 @@ CityGuideNPCData = {
         icon = MINIMAP_ICONS.CATALYST,
         minimapIcon = MINIMAP_ICONS.CATALYST,
         noCluster = true, 
+        textDirection = "top",
+        labelDistance = "0.8",
     },
     {
         x = 56.28 / 100, 
@@ -794,7 +800,7 @@ CityGuideNPCData = {
         y = 78.21 / 100, 
         name = "Delves", 
         icon = "Interface\\Icons\\ui_delves",
-        minimapIcon = "Interface\\Icons\\ui_delves"
+        minimapIcon = MINIMAP_ICONS.DELVES
     },
     {
         x = 45.05 / 100, 
@@ -817,7 +823,7 @@ CityGuideNPCData = {
         y = 78.15 / 100, 
         name = "TP", 
         icon = "Interface\\Icons\\Tradingpostcurrency", 
-        minimapIcon = "Interface\\Icons\\Tradingpostcurrency",
+        minimapIcon = MINIMAP_ICONS.TRADINGPOST,
         noCluster = true, 
         color = "99CCFF"
     },
@@ -848,12 +854,12 @@ CityGuideNPCData = {
     {
         x = 35.28 / 100,
         y = 65.70 / 100,
-        name = "Voidstorm", 
+        name = "Void", 
         icon = "Interface\\Icons\\inv_zone_voidstorm", 
         minimapIcon = MINIMAP_ICONS.COMET, 
         noCluster = true, 
         textDirection = "left", 
-        labelDistance = 1.5
+        labelDistance = 1.3
     },
     {
         x = 51.06 / 100,
@@ -863,6 +869,15 @@ CityGuideNPCData = {
         minimapIcon = MINIMAP_ICONS.DECOR,
         noCluster = true, 
         textDirection = "top", 
+    },
+    {
+        x = 41.60/ 100,
+        y = 66.90 / 100,
+        name = "Finery", 
+        icon = "Interface\\Icons\\ui_plundercoins",
+        minimapIcon = MINIMAP_ICONS.VENDOR,
+        noCluster = true, 
+        textDirection = "right", 
     },
 
     -- Horde Only

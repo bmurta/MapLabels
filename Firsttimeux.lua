@@ -93,6 +93,29 @@ local function CreateTutorialFrame()
     badge:SetPoint("TOPLEFT", tutorialFrame, "TOPLEFT", 8, -6)
     badge:SetText("|cff00d4ffTIP|r")
 
+    -- Close button (X) top-right
+    local closeBtn = CreateFrame("Button", nil, tutorialFrame)
+    closeBtn:SetSize(16, 16)
+    closeBtn:SetPoint("TOPRIGHT", tutorialFrame, "TOPRIGHT", -4, -4)
+    closeBtn:SetFrameLevel(tutorialFrame:GetFrameLevel() + 5)
+
+    local closeText = closeBtn:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    closeText:SetAllPoints(closeBtn)
+    closeText:SetJustifyH("CENTER")
+    closeText:SetText("|cffaaaaaaX|r")
+
+    closeBtn:SetScript("OnEnter", function() closeText:SetText("|cffffffffX|r") end)
+    closeBtn:SetScript("OnLeave", function() closeText:SetText("|cffaaaaaaX|r") end)
+    closeBtn:SetScript("OnClick", function()
+        CityGuideConfig.tutorialSeen = true
+        tutorialFrame:Hide()
+        if highlightFrame then
+            if highlightFrame.anim then highlightFrame.anim:Stop() end
+            highlightFrame:Hide()
+        end
+        tutorialVisible = false
+    end)
+
     -- Right-click hint
     local rightText = tutorialFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     rightText:SetPoint("TOPLEFT", tutorialFrame, "TOPLEFT", 8, -20)
@@ -124,7 +147,7 @@ local function UpdateTutorialText()
     local rightColor = rightDone and "ffaaaaaa" or "ffffffff"
     local midColor   = midDone   and "ffaaaaaa" or "ffffffff"
 
-    tutorialFrame.rightText:SetText((rightDone and readyTex or waitingTex) .. "|c" .. rightColor .. "Right-click the mode icon to change mode|r")
+    tutorialFrame.rightText:SetText((rightDone and readyTex or waitingTex) .. "|c" .. rightColor .. "Right-click to change mode|r")
     tutorialFrame.midText:SetText(  (midDone   and readyTex or waitingTex) .. "|c" .. midColor   .. "Middle-click to enable/disable in this city|r")
 end
 
