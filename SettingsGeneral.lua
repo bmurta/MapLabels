@@ -33,9 +33,9 @@ function CityGuideSettings_LoadGeneralSection()
     generalTitle:SetText("General Settings")
     generalTitle:SetTextColor(1, 0.9, 0.5)
     
-    -- Show Map Widget Container
+    -- Show Map Widget Container (expanded to fit waypoint checkbox)
     local widgetContainer = CreateFrame("Frame", nil, generalSection, "BackdropTemplate")
-    widgetContainer:SetSize(380, 100)
+    widgetContainer:SetSize(380, 135)
     widgetContainer:SetPoint("TOPLEFT", titleContainer, "BOTTOMLEFT", 0, -20)
     widgetContainer:SetBackdrop({
         bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -82,6 +82,31 @@ function CityGuideSettings_LoadGeneralSection()
     
     showMapWidgetCheck:SetScript("OnLeave", function(self)
         showMapWidgetLabel:SetTextColor(1, 1, 1)
+        GameTooltip:Hide()
+    end)
+
+    -- Waypoint checkbox
+    local enableWaypointsCheck = CreateFrame("CheckButton", nil, widgetContainer, "UICheckButtonTemplate")
+    enableWaypointsCheck:SetPoint("TOPLEFT", showMapWidgetCheck, "BOTTOMLEFT", 0, -8)
+
+    local enableWaypointsLabel = enableWaypointsCheck:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    enableWaypointsLabel:SetPoint("LEFT", enableWaypointsCheck, "RIGHT", 5, 0)
+    enableWaypointsLabel:SetText("Enable icon waypoints")
+
+    enableWaypointsCheck:SetScript("OnClick", function(self)
+        CityGuideConfig.enableWaypoints = self:GetChecked()
+    end)
+
+    enableWaypointsCheck:SetScript("OnEnter", function(self)
+        enableWaypointsLabel:SetTextColor(1, 1, 0.5)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText("Enable Icon Waypoints")
+        GameTooltip:AddLine("When enabled, left-clicking any icon on the map sets a waypoint at that location", 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+
+    enableWaypointsCheck:SetScript("OnLeave", function(self)
+        enableWaypointsLabel:SetTextColor(1, 1, 1)
         GameTooltip:Hide()
     end)
     
@@ -134,6 +159,7 @@ function CityGuideSettings_LoadGeneralSection()
     -- Store references for updates
     generalSection.cityCheckboxes = cityCheckboxes
     generalSection.showMapWidgetCheck = showMapWidgetCheck
+    generalSection.enableWaypointsCheck = enableWaypointsCheck
 end
 
 function CityGuideSettings_UpdateGeneralSection()
@@ -143,6 +169,11 @@ function CityGuideSettings_UpdateGeneralSection()
     -- Update map widget checkbox
     if section.showMapWidgetCheck then
         section.showMapWidgetCheck:SetChecked(CityGuideConfig.showMapWidget)
+    end
+
+    -- Update waypoint checkbox
+    if section.enableWaypointsCheck then
+        section.enableWaypointsCheck:SetChecked(CityGuideConfig.enableWaypoints ~= false)
     end
     
     -- Update city checkboxes

@@ -20,9 +20,9 @@ local function CaptureCoordinates(npcName, iconPath)
 
     local output
     if iconPath then
-        output = string.format('{x = %.2f / 100, y = %.2f / 100, name = "%s", icon = "%s"},', x, y, npcName, iconPath)
+        output = string.format('x = %.2f / 100, \ny = %.2f / 100, \nname = "%s", icon = "%s",', x, y, npcName, iconPath)
     else
-        output = string.format('{x = %.2f / 100, y = %.2f / 100, name = "%s", icon = "ICON_PATH_HERE"},', x, y, npcName)
+        output = string.format('x = %.2f / 100, \ny = %.2f / 100, \nname = "%s", icon = "ICON_PATH_HERE",', x, y, npcName)
     end
 
     print("|cff00ff00Coordinate captured!|r")
@@ -83,7 +83,7 @@ local function HandleCoordsOnly()
     x = x * 100
     y = y * 100
 
-    local output = string.format('{x = %.2f / 100, y = %.2f / 100,', x, y)
+    local output = string.format('x = %.2f / 100, \ny = %.2f / 100,', x, y)
 
     print("|cff00ff00Coordinates captured!|r")
     print(output)
@@ -101,7 +101,7 @@ local function HandleCoordsOnly()
 
         CityGuideCoordsFrame.title = CityGuideCoordsFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
         CityGuideCoordsFrame.title:SetPoint("TOP", 0, -5)
-        CityGuideCoordsFrame.title:SetText("Copy Map ID (Ctrl+A, Ctrl+C)")
+        CityGuideCoordsFrame.title:SetText("Copy Coordinates (Ctrl+A, Ctrl+C)")
 
         local scrollFrame = CreateFrame("ScrollFrame", nil, CityGuideCoordsFrame, "UIPanelScrollFrameTemplate")
         scrollFrame:SetPoint("TOPLEFT", 10, -30)
@@ -201,33 +201,18 @@ local function HandleSlashCommand(msg)
             CityGuideConfig.displayMode = "labels"
         end
         print("|cff00ff00City Guide:|r Switched to " .. CityGuideConfig.displayMode .. " mode!")
-        CityGuide_UpdateMapLabels()
-    elseif cmd == "prof" or cmd == "professions" then
+    elseif cmd == "prof" then
         CityGuideConfig.filterByProfession = not CityGuideConfig.filterByProfession
-        if CityGuideConfig.filterByProfession then
-            print("|cff00ff00City Guide:|r Profession filter enabled")
-        else
-            print("|cff00ff00City Guide:|r Profession filter disabled")
-        end
+        print("|cff00ff00City Guide:|r Profession filter " .. (CityGuideConfig.filterByProfession and "enabled" or "disabled"))
         CityGuide_UpdateMapLabels()
     elseif cmd == "decor" then
         CityGuideConfig.showDecorPOIs = not CityGuideConfig.showDecorPOIs
-        if CityGuideConfig.showDecorPOIs then
-            print("|cff00ff00City Guide:|r Decor POIs enabled")
-        else
-            print("|cff00ff00City Guide:|r Decor POIs disabled")
-        end
+        print("|cff00ff00City Guide:|r Decor POIs " .. (CityGuideConfig.showDecorPOIs and "shown" or "hidden"))
         CityGuide_UpdateMapLabels()
     elseif cmd == "widget" then
         CityGuideConfig.showMapWidget = not CityGuideConfig.showMapWidget
-        if CityGuideConfig.showMapWidget then
-            print("|cff00ff00City Guide:|r Map widget enabled")
-        else
-            print("|cff00ff00City Guide:|r Map widget disabled")
-        end
+        print("|cff00ff00City Guide:|r Map widget " .. (CityGuideConfig.showMapWidget and "shown" or "hidden"))
         CityGuide_UpdateMapLabels()
-    elseif cmd == "tutorial" then
-        CityGuide_ResetTutorial()
     elseif cmd == "labelsize" then
         local size = tonumber(arg)
         if size and size >= 0.5 and size <= 2.0 then

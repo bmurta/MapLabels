@@ -22,6 +22,8 @@ if CityGuideConfig.useTooltips == nil then
 end
 -- Default to enabled - only disable if explicitly set to false
 CityGuideConfig.showMapWidget = CityGuideConfig.showMapWidget ~= false
+-- Waypoint: clicking an icon sets a map waypoint
+CityGuideConfig.enableWaypoints = CityGuideConfig.enableWaypoints ~= false
 -- Label/icon strata priority: "under" (below quests), "normal", "top" (always on top)
 CityGuideConfig.labelPriority = CityGuideConfig.labelPriority or "normal"
 
@@ -132,14 +134,14 @@ function CityGuide_UpdateMapLabels()
     if CityGuideConfig.displayMode == "icons" then
         -- Icons only - NO CLUSTERING, use original positions, regular square icons
         for i, npc in ipairs(filteredNPCList) do
-            local label = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, nil, scale, finalIconSize)
+            local label = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, nil, scale, finalIconSize, nil, npc.name)
             table.insert(activeLabels, label)
         end
         
     elseif CityGuideConfig.displayMode == "smallicons" then
         -- Small Icons only - NO CLUSTERING, use original positions, minimap style
         for i, npc in ipairs(filteredNPCList) do
-            local label = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, npc.minimapIcon, scale, finalIconSize)
+            local label = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, npc.minimapIcon, scale, finalIconSize, nil, npc.name)
             table.insert(activeLabels, label)
         end
         
@@ -195,7 +197,7 @@ function CityGuide_UpdateMapLabels()
             -- Normal mode: Show icons and labels
             -- Show icons for FILTERED list (ALL icons stay, including professions)
             for i, npc in ipairs(filteredNPCList) do
-                local icon = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, nil, scale, finalIconSize)
+                local icon = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, nil, scale, finalIconSize, nil, npc.name)
                 table.insert(activeLabels, icon)
             end
             
@@ -251,7 +253,7 @@ function CityGuide_UpdateMapLabels()
             -- Normal mode: Show icons and labels
             -- Show icons for FILTERED list (ALL icons stay, including professions)
             for i, npc in ipairs(filteredNPCList) do
-                local icon = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, npc.minimapIcon, scale, finalIconSize)
+                local icon = CityGuide_CreateIconOnly(canvas, npc.x, npc.y, npc.icon, npc.minimapIcon, scale, finalIconSize, nil, npc.name)
                 table.insert(activeLabels, icon)
             end
             

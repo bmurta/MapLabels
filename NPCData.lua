@@ -52,6 +52,8 @@ local MINIMAP_ICONS = {
     DELVES = "Interface\\AddOns\\CityGuide\\Icons\\delves",
     TRADINGPOST = "Interface\\AddOns\\CityGuide\\Icons\\tp",
     VENDOR = "Interface\\AddOns\\CityGuide\\Icons\\vendor",
+    BMAH = "Interface\\AddOns\\CityGuide\\Icons\\BMAH",
+    HARANDAR = "Interface\\AddOns\\CityGuide\\Icons\\harandar",
 }
 
 -- IMPORTANT: Only define CityGuideNPCData ONCE!
@@ -828,8 +830,8 @@ CityGuideNPCData = {
         color = "99CCFF"
     },
     {
-        x = 34.09 / 100, 
-        y = 81.11 / 100, 
+        x = 36.30 / 100, 
+        y = 81.06 / 100, 
         name = "PvP", 
         icon = "Interface\\Icons\\achievement_legionpvp2tier3", 
         minimapIcon = MINIMAP_ICONS.PVP_OLD,
@@ -845,11 +847,11 @@ CityGuideNPCData = {
         color = "FF2020",
     },
     {
-        x = 36.97 / 100,
-        y = 68.12 / 100,
+        x = 36.91 / 100,
+        y = 68.07 / 100,
         name = "Harandar", 
         icon = "Interface\\Icons\\inv_achievement_zone_harandar", 
-        minimapIcon = MINIMAP_ICONS.ARGUS,        
+        minimapIcon = MINIMAP_ICONS.HARANDAR,        
     },
     {
         x = 35.28 / 100,
@@ -878,6 +880,15 @@ CityGuideNPCData = {
         minimapIcon = MINIMAP_ICONS.VENDOR,
         noCluster = true, 
         textDirection = "right", 
+    },
+    {
+        x = 51.86/ 100,
+        y = 48.56 / 100,
+        name = "BMAH", 
+        icon = "Interface\\Icons\\inv_misc_coin_16",
+        minimapIcon = MINIMAP_ICONS.BMAH,
+        noCluster = true, 
+        textDirection = "top", 
     },
 
     -- Horde Only
