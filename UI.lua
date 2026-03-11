@@ -165,9 +165,20 @@ function CityGuide_CreateIconOnly(parent, x, y, iconPath, minimapIcon, scale, si
         if button == "LeftButton" and CityGuideConfig.enableWaypoints then
             local mapID = WorldMapFrame:GetMapID()
             if mapID and C_Map.CanSetUserWaypointOnMap(mapID) then
-                C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(mapID, x, y))
-                C_SuperTrack.SetSuperTrackedUserWaypoint(true)
-                PlaySound(SOUNDKIT.UI_MAP_WAYPOINT_SUPER_TRACK_ON)
+                local existing = C_Map.GetUserWaypoint()
+                if existing and existing.uiMapID == mapID
+                    and math.abs(existing.position.x - x) < 0.0001
+                    and math.abs(existing.position.y - y) < 0.0001 then
+                    -- Same icon clicked again — remove the waypoint
+                    C_Map.ClearUserWaypoint()
+                    C_SuperTrack.SetSuperTrackedUserWaypoint(false)
+                    PlaySound(SOUNDKIT.UI_MAP_WAYPOINT_SUPER_TRACK_OFF)
+                else
+                    -- New icon — set the waypoint
+                    C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(mapID, x, y))
+                    C_SuperTrack.SetSuperTrackedUserWaypoint(true)
+                    PlaySound(SOUNDKIT.UI_MAP_WAYPOINT_SUPER_TRACK_ON)
+                end
             end
         end
     end)
